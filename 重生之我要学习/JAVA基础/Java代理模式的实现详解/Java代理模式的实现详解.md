@@ -332,7 +332,7 @@ public class BuyHomeDynamicProxyTest {
 
 我们可以在场景实现中看到，整个动态代理的过程，主要涉及到一个接口InvocationHandler和一个类Proxy。
 
-Proxy类通过静态方法newProxyInstance来生成一个代理对象实例，其源码以及注释（含翻译）如下所示
+Proxy类通过静态方法newProxyInstance来生成一个代理对象实例，其源码以及注释（含英文注释翻译）如下所示
 
 ```java
  /**
@@ -460,19 +460,19 @@ Proxy类通过静态方法newProxyInstance来生成一个代理对象实例，�
 
 关于newProxyInstance静态方法的三个入参在源码的注释中已经有清晰的说明，这里再进行一个详细的解释：
 
-- `ClassLoader loader`: 类加载器，用于加载代理对象 
+- `ClassLoader loader`: 这里放入的是目标对象的类加载器，用于加载代理对象 。
 
-- `Class<?>[] interfaces`: 被代理类实现的接口列表（如果有多个，生成代理对象会实现所有的接口）
+- `Class<?>[] interfaces`: 被代理对象需要实现的接口列表（如果有多个，生成代理对象会实现所有的接口）
 
-- `InvocationHandler h`: 实现了 `InvocationHandler` 接口的对象，将方法调用分派到的调用处理程序。
+- `InvocationHandler h`: （调用处理器）是Java动态代理机制中的一个接口，它定义了代理对象调用方法时的处理方式。传入实现了 `InvocationHandler` 接口的对象，代理对象方法调用时分派到的调用处理程序。
 
-  当动态代理对象调用一个方法时，这个方法的调用就会被转发到实现InvocationHandler 接口类的 invoke 方法来调用，InvocationHandler 接口类中只有一个invoke抽象方法，其有三个参数，分别如下所示
+  当动态代理对象调用一个方法时，这个方法的调用就会被转发到实现InvocationHandler 接口类的 invoke 方法来调用，可以在`invoke`方法中添加前置处理（如日志记录、权限验证等）和后置处理（如性能监控、异常处理等），以达到更灵活地控制代理对象的行为。InvocationHandler 接口类中只有一个invoke抽象方法，源码如下所示
 
   ```java
   /**
    * {@code InvocationHandler} is the interface implemented by
    * the <i>invocation handler</i> of a proxy instance.
-   * 【InvocationHandler接口是被代理实例的调用处理程序实现的接口】
+   * 【InvocationHandler接口是代理对象实例的调用处理程序实现的接口】即定义了代理对象调用方法时的处理方式
    *
    * <p>Each proxy instance has an associated invocation handler.
    * When a method is invoked on a proxy instance, the method
@@ -494,14 +494,14 @@ Proxy类通过静态方法newProxyInstance来生成一个代理对象实例，�
        * 【处理代理实例上的方法调用并返回结果。当在与其关联的代理实例上调用方法时，将在调用处理程序上调用此方法。】 即代理对象的方法
        *
        * @param   proxy the proxy instance that the method was invoked on
-       * 【代理调用该方法的代理实例】即代理对象
+       * 【代理调用该方法的代理实例】即方法调用发生的那个代理对象
        * 
        * @param   method the {@code Method} instance corresponding to
        * the interface method invoked on the proxy instance.  The declaring
        * class of the {@code Method} object will be the interface that
        * the method was declared in, which may be a superinterface of the
        * proxy interface that the proxy class inherits the method through.
-       * 【方法在代理实例上调用的接口方法对应的method实例。Method对象的声明类将是该方法被声明的接口，该接口可能是代理类继承该方法所通过的代理接口的超接口。】 即代表目标对象的方法信息，Method对象包含了关于被调用方法的所有信息，包括方法名、参数列表、返回类型等
+       * 【方法在代理实例上调用的接口方法对应的method实例。Method对象的声明类将是该方法被声明的接口，该接口可能是代理类继承该方法所通过的代理接口的超接口。】 即当前代理对象所调用方法所对应的抽象基类的方法信息，Method对象包含了关于被调用方法的所有信息，包括方法名、参数列表、返回类型等
        * 
        * @param   args an array of objects containing the values of the
        * arguments passed in the method invocation on the proxy instance,
@@ -546,6 +546,12 @@ Proxy类通过静态方法newProxyInstance来生成一个代理对象实例，�
           throws Throwable;
   }
   ```
+  
+  在invoke方法中打一个断点，然后当代理对象dynamicProxyBuyHomeB调用buy（）方法后，结果如下所示
+  
+  ![image-20240513132831684](Java%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3.assets/image-20240513132831684.png)
+  
+  其中这里会涉及到Method对象的invoke方法，可以参考文章:[java反射之Method的invoke方法实现]( https://blog.csdn.net/wenyuan65/article/details/81145900)
 
 
 
@@ -773,7 +779,541 @@ private static Object newProxyInstance(Class<?> caller, // null if no SecurityMa
 
 
 
-## 五、补充
+### 4.4、查看代理对象信息
+
+我们在测试类中添加如下代码，将生成的代理对象保存到工作目录下
+
+```java
+//新版本 jdk产生代理类
+System.getProperties().put("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");
+
+// 如果上述代码加上不生效可以考虑加下下面的代码：
+ // 老版本jdk
+System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+//  该设置用于输出cglib动态代理产生的类
+System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "C:\\class"); 
+```
+
+再次运行测试类代码
+
+```java
+public class BuyHomeDynamicProxyTest {
+    public static void main(String[] args) {
+
+        //新版本 jdk产生代理类
+        // 指示 JDK 在生成动态代理类时将其保存到文件系统中，通常是在当前工作目录下的 com/sun/proxy 目录中，而不是在内存中动态生成
+        System.getProperties().put("jdk.proxy.ProxyGenerator.saveGeneratedFiles", "true");
+
+        // 创建A同学对象
+        BuyHomeA buyHomeA = new BuyHomeA();
+        // 通过动态代理创建中介B对象
+        MyInvocationHandler myInvocationHandler = new MyInvocationHandler(buyHomeA);
+        BuyHomeObject dynamicProxyBuyHomeB  = (BuyHomeObject) Proxy.newProxyInstance(BuyHomeA.class.getClassLoader(),
+                BuyHomeA.class.getInterfaces(), myInvocationHandler);
+        // 中介B帮忙寻找、购买房源（购买肯定是A同学自己购买）
+        dynamicProxyBuyHomeB.buy();
+		
+        // 打印代理类的类对象信息
+        /*System.out.println("代理类："+ dynamicProxyBuyHomeB.getClass());*/
+
+    }
+}
+```
+
+可以在工作目录com/sun/proxy下找到我们输出的代理对象信息，内容如下所示
+
+```java
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+package com.sun.proxy;
+
+import com.yjy.Proxy.DynamicProxy.BuyHomeObject;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
+
+// 集成Proxy 实现目标对象的基类BuyHomeObject
+//  jdk 动态代理必须基于接口，因为java是单继承的，已经集成了Proxy
+public final class $Proxy0 extends Proxy implements BuyHomeObject {
+    private static Method m1;
+    private static Method m2;
+    private static Method m3;
+    private static Method m0;
+
+    public $Proxy0(InvocationHandler var1) throws  {
+        super(var1);
+    }
+
+    public final boolean equals(Object var1) throws  {
+        try {
+            return (Boolean)super.h.invoke(this, m1, new Object[]{var1});
+        } catch (RuntimeException | Error var3) {
+            throw var3;
+        } catch (Throwable var4) {
+            throw new UndeclaredThrowableException(var4);
+        }
+    }
+
+    public final String toString() throws  {
+        try {
+            return (String)super.h.invoke(this, m2, (Object[])null);
+        } catch (RuntimeException | Error var2) {
+            throw var2;
+        } catch (Throwable var3) {
+            throw new UndeclaredThrowableException(var3);
+        }
+    }
+
+    public final void buy() throws  {
+        try {
+            // h即proxy类中的protected InvocationHandler h
+            // 即调用调用处理程序的invoke方法
+            super.h.invoke(this, m3, (Object[])null);
+        } catch (RuntimeException | Error var2) {
+            throw var2;
+        } catch (Throwable var3) {
+            throw new UndeclaredThrowableException(var3);
+        }
+    }
+
+    public final int hashCode() throws  {
+        try {
+            return (Integer)super.h.invoke(this, m0, (Object[])null);
+        } catch (RuntimeException | Error var2) {
+            throw var2;
+        } catch (Throwable var3) {
+            throw new UndeclaredThrowableException(var3);
+        }
+    }
+
+    static {
+        try {
+            m1 = Class.forName("java.lang.Object").getMethod("equals", Class.forName("java.lang.Object"));
+            m2 = Class.forName("java.lang.Object").getMethod("toString");
+            m3 = Class.forName("com.yjy.Proxy.DynamicProxy.BuyHomeObject").getMethod("buy");
+            m0 = Class.forName("java.lang.Object").getMethod("hashCode");
+        } catch (NoSuchMethodException var2) {
+            throw new NoSuchMethodError(var2.getMessage());
+        } catch (ClassNotFoundException var3) {
+            throw new NoClassDefFoundError(var3.getMessage());
+        }
+    }
+}
+
+```
+
+
+
+## 五、cglib动态代理
+
+### 5.1、说明
+
+上述jdk动态代理只能代理实现接口的类，如果想要对类实现代理我们可以通过cglib动态代理来解决关于类的动态代理。
+
+> [CGLIB](https://github.com/cglib/cglib)(*Code Generation Library*)是一个基于[ASM](http://www.baeldung.com/java-asm)的字节码生成库，它允许我们在运行时对字节码进行修改和动态生成。CGLIB 通过继承方式实现代理。很多知名的开源框架都使用到了[CGLIB](https://github.com/cglib/cglib)， 例如 Spring 中的 AOP 模块中：如果目标对象实现了接口，则默认采用 JDK 动态代理，否则采用 CGLIB 动态代理。
+
+优点：
+
+1. 性能高： CGLIB 直接对字节码进行操作，相比于 JDK 动态代理的反射调用，性能更高。因为它通过生成子类的方式来代理目标类，而不是通过实现接口的方式。
+2. 不需要目标对象实现接口： JDK 动态代理要求目标对象必须实现接口，而 CGLIB 可以代理没有实现接口的类。
+3. 更强大的功能： CGLIB 不仅可以代理类的方法，还可以代理类的属性。
+4. 更灵活： CGLIB 可以代理没有公共构造方法的类，以及被 `final` 修饰的类的方法。
+
+缺点：
+
+1. 性能相对 JDK 动态代理更低： 尽管 CGLIB 的性能较高，但相比于直接调用目标方法，仍然存在一定的性能开销。而且生成的代理类会增加类加载的时间和内存消耗。
+2. 类加载器敏感： CGLIB 动态代理生成的代理类是目标类的子类，因此可能会受到类加载器的限制。在一些场景下，例如使用不同的类加载器加载目标类和代理类时，可能会出现类转换异常。
+3. 无法代理 final 方法和 private 方法： CGLIB 无法代理 `final` 方法和 `private` 方法，因为它是通过生成子类来代理目标类的方法，而 `final` 方法和 `private` 方法无法被子类重写。
+4. Debugging困难： 由于 CGLIB 是在运行时生成字节码来创建代理类，因此调试起来可能会比较困难，不如 JDK 动态代理那样直观。
+
+### 5.2、场景实现
+
+**模拟场景**：同学A想要买房，但是他不了解如何去找好的房源，因此其委托中介B去帮忙完成寻找房源的过程。
+
+**具体实现:*
+
+引入cglib依赖
+
+```xml
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.3.0</version>
+</dependency>
+```
+
+创建买房对象同学A
+
+```java
+/**
+ * 买房对象 同学A
+ * @author banana
+ * @create 2024-05-12 15:18
+ */
+public class BuyHomeA implements BuyHomeObject {
+    // 同学A的购买方法
+    @Override
+    public void buy() {
+        System.out.println("同学A付买房费用……");
+    }
+}
+
+```
+
+创建一个自定义 MethodInterceptor
+
+```java
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
+/**
+ * @author banana
+ * @create 2024-05-13 22:28
+ */
+public class MyInterceptor implements MethodInterceptor {
+    @Override
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        preBuy();
+        Object object = methodProxy.invokeSuper(o, objects);
+        afterBuy();
+        return object;
+    }
+
+    // 购买前操作
+    public void preBuy() {
+        System.out.println("中介收取前期费用……");
+        System.out.println("中介找到适合的房源……");
+    }
+
+    // 购买后操作
+    public void afterBuy() {
+        System.out.println("中介收取后期费用……");
+    }
+}
+```
+
+创建测试类进行测试
+
+```java
+/**
+ * 测试类
+ * @author banana
+ * @create 2024-05-13 22:29
+ */
+public class CglibProxyTest {
+    public static void main(String[] args) {
+        // //在指定目录下生成动态代理类
+        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "C:\\class");
+        
+        //创建Enhancer对象，类似于JDK动态代理的Proxy类，下一步就是设置几个参数
+        Enhancer enhancer = new Enhancer();
+        //设置目标类的字节码文件
+        enhancer.setSuperclass(BuyHomeA.class);
+        //设置回调函数
+        enhancer.setCallback(new MyInterceptor());
+        //这里的creat方法就是正式创建代理类
+        BuyHomeA buyHomeA = (BuyHomeA)enhancer.create();
+        //调用代理类的buy方法
+        buyHomeA.buy();
+        
+        // 打印代理类的类对象信息
+        System.out.println("cglib动态代理："+ buyHomeA.getClass());
+    }
+}
+```
+
+运行结果
+
+```
+中介收取前期费用……
+中介找到适合的房源……
+同学A付买房费用……
+中介收取后期费用……
+cglib动态代理：class com.yjy.Proxy.CglibProxy.BuyHomeA$$EnhancerByCGLIB$$c382daf2
+```
+
+### 5.3、实现原理
+
+略，有空补充
+
+### 5.4、查看代理对象信息
+
+```java
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+package com.yjy.Proxy.CglibProxy;
+
+import java.lang.reflect.Method;
+import net.sf.cglib.core.ReflectUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Factory;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+// 其集成了目标啊对象 实现了Factory
+public class BuyHomeA$$EnhancerByCGLIB$$c382daf2 extends BuyHomeA implements Factory {
+    private boolean CGLIB$BOUND;
+    public static Object CGLIB$FACTORY_DATA;
+    private static final ThreadLocal CGLIB$THREAD_CALLBACKS;
+    private static final Callback[] CGLIB$STATIC_CALLBACKS;
+    private MethodInterceptor CGLIB$CALLBACK_0;
+    private static Object CGLIB$CALLBACK_FILTER;
+    private static final Method CGLIB$buy$0$Method;
+    private static final MethodProxy CGLIB$buy$0$Proxy;
+    private static final Object[] CGLIB$emptyArgs;
+    private static final Method CGLIB$equals$1$Method;
+    private static final MethodProxy CGLIB$equals$1$Proxy;
+    private static final Method CGLIB$toString$2$Method;
+    private static final MethodProxy CGLIB$toString$2$Proxy;
+    private static final Method CGLIB$hashCode$3$Method;
+    private static final MethodProxy CGLIB$hashCode$3$Proxy;
+    private static final Method CGLIB$clone$4$Method;
+    private static final MethodProxy CGLIB$clone$4$Proxy;
+
+    static void CGLIB$STATICHOOK1() {
+        CGLIB$THREAD_CALLBACKS = new ThreadLocal();
+        CGLIB$emptyArgs = new Object[0];
+        Class var0 = Class.forName("com.yjy.Proxy.CglibProxy.BuyHomeA$$EnhancerByCGLIB$$c382daf2");
+        Class var1;
+        CGLIB$buy$0$Method = ReflectUtils.findMethods(new String[]{"buy", "()V"}, (var1 = Class.forName("com.yjy.Proxy.CglibProxy.BuyHomeA")).getDeclaredMethods())[0];
+        CGLIB$buy$0$Proxy = MethodProxy.create(var1, var0, "()V", "buy", "CGLIB$buy$0");
+        Method[] var10000 = ReflectUtils.findMethods(new String[]{"equals", "(Ljava/lang/Object;)Z", "toString", "()Ljava/lang/String;", "hashCode", "()I", "clone", "()Ljava/lang/Object;"}, (var1 = Class.forName("java.lang.Object")).getDeclaredMethods());
+        CGLIB$equals$1$Method = var10000[0];
+        CGLIB$equals$1$Proxy = MethodProxy.create(var1, var0, "(Ljava/lang/Object;)Z", "equals", "CGLIB$equals$1");
+        CGLIB$toString$2$Method = var10000[1];
+        CGLIB$toString$2$Proxy = MethodProxy.create(var1, var0, "()Ljava/lang/String;", "toString", "CGLIB$toString$2");
+        CGLIB$hashCode$3$Method = var10000[2];
+        CGLIB$hashCode$3$Proxy = MethodProxy.create(var1, var0, "()I", "hashCode", "CGLIB$hashCode$3");
+        CGLIB$clone$4$Method = var10000[3];
+        CGLIB$clone$4$Proxy = MethodProxy.create(var1, var0, "()Ljava/lang/Object;", "clone", "CGLIB$clone$4");
+    }
+
+    final void CGLIB$buy$0() {
+        super.buy();
+    }
+
+    public final void buy() {
+        MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+        if (var10000 == null) {
+            CGLIB$BIND_CALLBACKS(this);
+            var10000 = this.CGLIB$CALLBACK_0;
+        }
+
+        if (var10000 != null) {
+            /*
+            调用intercept()方法，intercept()方法由自定义MyInterceptor实现，所以，最后调用MyInterceptor中的intercept()方法，从而完成了由代理对象访问到目标对象的动态代理实现
+            */
+            var10000.intercept(this, CGLIB$buy$0$Method, CGLIB$emptyArgs, CGLIB$buy$0$Proxy);
+        } else {
+            super.buy();
+        }
+    }
+
+    final boolean CGLIB$equals$1(Object var1) {
+        return super.equals(var1);
+    }
+
+    public final boolean equals(Object var1) {
+        MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+        if (var10000 == null) {
+            CGLIB$BIND_CALLBACKS(this);
+            var10000 = this.CGLIB$CALLBACK_0;
+        }
+
+        if (var10000 != null) {
+            Object var2 = var10000.intercept(this, CGLIB$equals$1$Method, new Object[]{var1}, CGLIB$equals$1$Proxy);
+            return var2 == null ? false : (Boolean)var2;
+        } else {
+            return super.equals(var1);
+        }
+    }
+
+    final String CGLIB$toString$2() {
+        return super.toString();
+    }
+
+    public final String toString() {
+        MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+        if (var10000 == null) {
+            CGLIB$BIND_CALLBACKS(this);
+            var10000 = this.CGLIB$CALLBACK_0;
+        }
+
+        return var10000 != null ? (String)var10000.intercept(this, CGLIB$toString$2$Method, CGLIB$emptyArgs, CGLIB$toString$2$Proxy) : super.toString();
+    }
+
+    final int CGLIB$hashCode$3() {
+        return super.hashCode();
+    }
+
+    public final int hashCode() {
+        MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+        if (var10000 == null) {
+            CGLIB$BIND_CALLBACKS(this);
+            var10000 = this.CGLIB$CALLBACK_0;
+        }
+
+        if (var10000 != null) {
+            Object var1 = var10000.intercept(this, CGLIB$hashCode$3$Method, CGLIB$emptyArgs, CGLIB$hashCode$3$Proxy);
+            return var1 == null ? 0 : ((Number)var1).intValue();
+        } else {
+            return super.hashCode();
+        }
+    }
+
+    final Object CGLIB$clone$4() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    protected final Object clone() throws CloneNotSupportedException {
+        MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+        if (var10000 == null) {
+            CGLIB$BIND_CALLBACKS(this);
+            var10000 = this.CGLIB$CALLBACK_0;
+        }
+
+        return var10000 != null ? var10000.intercept(this, CGLIB$clone$4$Method, CGLIB$emptyArgs, CGLIB$clone$4$Proxy) : super.clone();
+    }
+
+    public static MethodProxy CGLIB$findMethodProxy(Signature var0) {
+        String var10000 = var0.toString();
+        switch(var10000.hashCode()) {
+        case -1377614033:
+            if (var10000.equals("buy()V")) {
+                return CGLIB$buy$0$Proxy;
+            }
+            break;
+        case -508378822:
+            if (var10000.equals("clone()Ljava/lang/Object;")) {
+                return CGLIB$clone$4$Proxy;
+            }
+            break;
+        case 1826985398:
+            if (var10000.equals("equals(Ljava/lang/Object;)Z")) {
+                return CGLIB$equals$1$Proxy;
+            }
+            break;
+        case 1913648695:
+            if (var10000.equals("toString()Ljava/lang/String;")) {
+                return CGLIB$toString$2$Proxy;
+            }
+            break;
+        case 1984935277:
+            if (var10000.equals("hashCode()I")) {
+                return CGLIB$hashCode$3$Proxy;
+            }
+        }
+
+        return null;
+    }
+
+    public BuyHomeA$$EnhancerByCGLIB$$c382daf2() {
+        CGLIB$BIND_CALLBACKS(this);
+    }
+
+    public static void CGLIB$SET_THREAD_CALLBACKS(Callback[] var0) {
+        CGLIB$THREAD_CALLBACKS.set(var0);
+    }
+
+    public static void CGLIB$SET_STATIC_CALLBACKS(Callback[] var0) {
+        CGLIB$STATIC_CALLBACKS = var0;
+    }
+
+    private static final void CGLIB$BIND_CALLBACKS(Object var0) {
+        BuyHomeA$$EnhancerByCGLIB$$c382daf2 var1 = (BuyHomeA$$EnhancerByCGLIB$$c382daf2)var0;
+        if (!var1.CGLIB$BOUND) {
+            var1.CGLIB$BOUND = true;
+            Object var10000 = CGLIB$THREAD_CALLBACKS.get();
+            if (var10000 == null) {
+                var10000 = CGLIB$STATIC_CALLBACKS;
+                if (var10000 == null) {
+                    return;
+                }
+            }
+
+            var1.CGLIB$CALLBACK_0 = (MethodInterceptor)((Callback[])var10000)[0];
+        }
+
+    }
+
+    public Object newInstance(Callback[] var1) {
+        CGLIB$SET_THREAD_CALLBACKS(var1);
+        BuyHomeA$$EnhancerByCGLIB$$c382daf2 var10000 = new BuyHomeA$$EnhancerByCGLIB$$c382daf2();
+        CGLIB$SET_THREAD_CALLBACKS((Callback[])null);
+        return var10000;
+    }
+
+    public Object newInstance(Callback var1) {
+        CGLIB$SET_THREAD_CALLBACKS(new Callback[]{var1});
+        BuyHomeA$$EnhancerByCGLIB$$c382daf2 var10000 = new BuyHomeA$$EnhancerByCGLIB$$c382daf2();
+        CGLIB$SET_THREAD_CALLBACKS((Callback[])null);
+        return var10000;
+    }
+
+    public Object newInstance(Class[] var1, Object[] var2, Callback[] var3) {
+        CGLIB$SET_THREAD_CALLBACKS(var3);
+        BuyHomeA$$EnhancerByCGLIB$$c382daf2 var10000 = new BuyHomeA$$EnhancerByCGLIB$$c382daf2;
+        switch(var1.length) {
+        case 0:
+            var10000.<init>();
+            CGLIB$SET_THREAD_CALLBACKS((Callback[])null);
+            return var10000;
+        default:
+            throw new IllegalArgumentException("Constructor not found");
+        }
+    }
+
+    public Callback getCallback(int var1) {
+        CGLIB$BIND_CALLBACKS(this);
+        MethodInterceptor var10000;
+        switch(var1) {
+        case 0:
+            var10000 = this.CGLIB$CALLBACK_0;
+            break;
+        default:
+            var10000 = null;
+        }
+
+        return var10000;
+    }
+
+    public void setCallback(int var1, Callback var2) {
+        switch(var1) {
+        case 0:
+            this.CGLIB$CALLBACK_0 = (MethodInterceptor)var2;
+        default:
+        }
+    }
+
+    public Callback[] getCallbacks() {
+        CGLIB$BIND_CALLBACKS(this);
+        return new Callback[]{this.CGLIB$CALLBACK_0};
+    }
+
+    public void setCallbacks(Callback[] var1) {
+        this.CGLIB$CALLBACK_0 = (MethodInterceptor)var1[0];
+    }
+
+    static {
+        CGLIB$STATICHOOK1();
+    }
+}
+
+```
+
+
+
+## 六、补充
 
 ### 5.1、ensureVisible方法确保类加载器能够解析接口的名称，并将其映射到相同的 Class 对象
 
@@ -868,7 +1408,7 @@ put方法被调用，将接口 intf 作为键，Boolean.TRUE 作为值放入集�
 
 
 
-## 六、问题
+## 七、问题
 
 ### 6.1、关于clv的来源
 
@@ -880,6 +1420,8 @@ put方法被调用，将接口 intf 作为键，Boolean.TRUE 作为值放入集�
 ```
 
 ### 6.2、关于④创建代理对象实例深挖
+
+略
 
 ### 6.3、如果被代理的对象有多个方法呢，那生成的代理对象的InvocationHandler实现类要怎么写
 
