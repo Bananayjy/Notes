@@ -1,0 +1,21 @@
+1、IDEA无法推到GitHUb
+git config --global http.proxy http://127.0.0.1:7890
+git config --global -l
+
+清除代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+查看Git的代理配置信息
+git config --get http.proxy
+git config --get https.proxy
+
+
+2、测试否能够通过SSH连接到GitHub的服务器
+ssh -T git@github.com
+
+
+问题汇总
+1、git add . 出现 Filename too long
+Windows系统下，在Git使用过程中，出现“filename too long”错误提示。直译成中文的意思就是：”文件名过长“。导致始终无法进行将文件添加到Git树中。可能因为项目的层次比较深而且文件夹和文件名称也比较长。GIt使用了旧版本的Windows API，导致它限制文件名不能超过260个字符。所以Git的Windows客户端默认是禁用长名称支持的。我们开启长名称支持即可。
+输入：git config --system core.longpaths true

@@ -720,9 +720,9 @@ ProxyBuilder(ClassLoader loader, List<Class<?>> interfaces) {
     	验证内容如下：
     	1、创建了一个 IdentityHashMap 对象 interfaceSet，用于存储代理对象所要实现的接口，并初始化其大小为接口列表的大小
     	2、遍历代理对象要实现的接口列表IdentityHashMap，对每个接口进行验证
-    		- 使用 ensureVisible 方法确保类加载器能够解析接口的名称，并将其映射到相同的 Class 对象（详情可见5.1）
-    		- 使用 isInterface() 方法验证当前类对象是否表示一个接口，如果不是，则抛出 IllegalArgumentException 异常 (详情见5.2)
-    		- 确保当前接口不是重复的，如果是重复的，则抛出 IllegalArgumentException 异常 (详情见5.3)
+    		- 使用 ensureVisible 方法确保类加载器能够解析接口的名称，并将其映射到相同的 Class 对象（详情可见6.1）
+    		- 使用 isInterface() 方法验证当前类对象是否表示一个接口，如果不是，则抛出 IllegalArgumentException 异常 (详情见6.2)
+    		- 确保当前接口不是重复的，如果是重复的，则抛出 IllegalArgumentException 异常 (详情见6.3)
     	3、通过ensureVisible 方法确保类加载器能够解析refTypes方法签名引用类型的名称，并将其映射到相同的 Class 对象
     */
     validateProxyInterfaces(loader, interfaces, refTypes);
@@ -1315,7 +1315,7 @@ public class BuyHomeA$$EnhancerByCGLIB$$c382daf2 extends BuyHomeA implements Fac
 
 ## 六、补充
 
-### 5.1、ensureVisible方法确保类加载器能够解析接口的名称，并将其映射到相同的 Class 对象
+### 6.1、ensureVisible方法确保类加载器能够解析接口的名称，并将其映射到相同的 Class 对象
 
 其源码如下所示
 
@@ -1361,7 +1361,7 @@ private static void ensureVisible(ClassLoader ld, Class<?> c) {
 
 
 
-### 5.2、isInterface方法验证当前类对象是否表示一个接口
+### 6.2、isInterface方法验证当前类对象是否表示一个接口
 
 其在Proxy类的validateProxyInterfaces方法中被调用
 
@@ -1393,7 +1393,7 @@ public native boolean isInterface();
 
 
 
-### 5.3、确保当前接口不是重复的
+### 6.3、确保当前接口不是重复的
 
 ```java
  /*
