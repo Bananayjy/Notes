@@ -319,7 +319,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.6 KVM和CDC/CLDC Hotspot
+### 8.6 KVM和CDC/CLDC Hotspot
 
 - Oracle在Java ME(Java平台的一个分支，专门设计用于嵌入式设备、移动设备和其他资源受限的环境中)产品线上的两款虚拟机为:CDC/CLDC HotSpot Implementation VM
 
@@ -332,7 +332,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.7 Azul VM
+### 8.7 Azul VM
 
 - 前面三大“高性能Java虚拟机”使用在通用硬件平台上
 - 这里Azu1 VM和BEA Liquid V是与特定硬件平台绑定、软硬件配合的专有虚拟机
@@ -343,7 +343,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.8 Liquid vM
+### 8.8 Liquid vM
 
 - 高性能Java虚拟机中的战斗机。
 - BEA公司开发的，直接运行在自家Hypervisor系统上
@@ -353,7 +353,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.9 Apache Harmony
+### 8.9 Apache Harmony
 
 - Apache也曾经推出过与JDK1.5和JDK1.6兼容的Java运行平台Apache Harmony.
 - 它是IBM和Inte1联合开发的开源JM，受到同样开源的openJDK的压制，Sun坚决不让Harmony获得JCP认证，最终于2011年退役，IBM转而参与OpenJDK
@@ -361,7 +361,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.10 Microsoft IM
+### 8.10 Microsoft IM
 
 - 微软为了在IE3浏览器中支持Java pplets，开发了Microsoft JVM。
 - 只能在window平台下运行。但确是当时windows下性能最好的Java V。
@@ -369,7 +369,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.11 taobaoJVM
+### 8.11 taobaoJVM
 
 - 由AliJVM 团队发布。阿里，国内使用Java最强大的公司，覆盖云计算、金融、物流电商等众多领域， 需要解决高并发、高可用、分布式的复合问题。有大量的开源产品。基于openJDK 开发了自己的定制版本AlibabaJDK，简称AJDK。是整个阿里Java体系的基石。
 - 基于openJDK Hotspot V 发布的国内第一个优化、深度定制且开源的高性能服务器版Java虚拟机。
@@ -383,7 +383,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.12 Dalvik VM
+### 8.12 Dalvik VM
 
 - 谷歌开发的，应用于Android系统，并在Android2.2中提供了JIT，发展迅猛。，它没有遵循 Java
 - Dalvik VM 只能称作虚拟机，而不能称作“Java 拟机”虚拟机规范
@@ -395,7 +395,7 @@ Exact VM（Exact Memory Management）: 准确式内存管理
 
 
 
-#### 8.13 Graal VM
+### 8.13 Graal VM
 
 - 2018年4月，0racle abs公开了GraalVM，号称"Run Programs raster Anywhere"，勃勃野心。与1995年java的”write once,run anywhere"遥相呼应。
 - Graal VM在HotSpot VM基础上增强而成的跨语言全栈虚拟机，可以作为“任何语言的运行平台使用。语言包括:Java、scala、Groovy、Kotlin;C、C++、JavaScript、Ruby、Python、R等
