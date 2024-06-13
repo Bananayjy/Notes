@@ -88,7 +88,11 @@ mysql -u root -p123456 database_name < backup_file.sql
 
 
 
-#### 2. 关于`#!/usr/bin/env bash`和`#!/usr/bin/bash`
+#### 2. 关于`#!/usr/bin/env bash`和`#!/usr/bin/bash`说明
+
+
+
+
 
 
 
@@ -102,7 +106,7 @@ mysql -u root -p123456 database_name < backup_file.sql
 
 #### 1. 初始化
 
-配置文件config.txt
+配置文件config.txt （默认名称）
 
 ```
 # MYSQL用户名
@@ -374,7 +378,7 @@ fi
 
 
 
-#### 1. 正常部署的MySQL【非Docker容器部署】实现数据库的备份
+#### 2. 正常部署的MySQL【非Docker容器部署】实现数据库的备份
 
 ```shell
 #!/bin/bash
@@ -421,7 +425,7 @@ echo $DATE" done"
 
 
 
-#### 2. 通过Docker部署的MySQL实现数据库的备份
+#### 3. 通过Docker部署的MySQL实现数据库的备份
 
 ```shell
 #!/usr/bin/bash
