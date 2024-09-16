@@ -16,6 +16,10 @@
 select * from table where id in （9223372036854775807, 9223372036854775808）
 ```
 
+### 1.3 原因
+
+见2.2的最后一点说明
+
 
 
 ## 二、详细说明 
@@ -183,7 +187,7 @@ select * from table where id in （9223372036854775807, 9223372036854775808）
 
   **示例2（官方）：**
 
-  ```sql
+  ```mysql
   mysql> SELECT 1 > '6x';
           -> 0
   mysql> SELECT 7 > '6x';
@@ -196,19 +200,32 @@ select * from table where id in （9223372036854775807, 9223372036854775808）
 
   在 MySQL 中，当字符串被尝试转换为数值时，其处理方式是从字符串的开头开始，尽可能多地提取数字部分，直到遇到无法识别的字符为止。
 
+  如
+
+  ```mysql
+  ‘6x’ -> 6
+  'x6' -> 0
+  ```
+
   
 
 - Comparison of JSON values takes place at two levels. The first level of comparison is based on the JSON types of the compared values. If the types differ, the comparison result is determined solely by which type has higher precedence. If the two values have the same JSON type, a second level of comparison occurs using type-specific rules. For comparison of JSON and non-JSON values, the non-JSON value is converted to JSON and the values compared as JSON values. For details, see [Comparison and Ordering of JSON Values](https://dev.mysql.com/doc/refman/5.7/en/json.html#json-comparison).
+
+- JSON值的比较在两个级别上进行。第一级比较基于被比较值的JSON类型。如果类型不同，比较结果完全取决于哪个类型具有更高的优先级。如果两个值具有相同的JSON类型，则使用特定于类型的规则进行第二级比较。对于JSON和非JSON值的比较，将非JSON值转换为JSON，将比较的值转换为JSON值。
 
 
 
 - For comparisons of a string column with a number, MySQL cannot use an index on the column to look up the value quickly. If *`str_col`* is an indexed string column, the index cannot be used when performing the lookup in the following statement:
 
+  对于字符串列与数字的比较，MySQL不能在列上使用索引来快速查找值。如果 ' str_col ' 是索引字符串列，则在执行以下语句中的查找时不能使用索引:
+  
   ```
   SELECT * FROM tbl_name WHERE str_col=1;
   ```
-
+  
   The reason for this is that there are many different strings that may convert to the value `1`, such as `'1'`, `' 1'`, or `'1a'`.
+  
+  这样做的原因是有许多不同的字符串可以转换为值“1”，例如"1''，"1“或"1a”
 
 
 
