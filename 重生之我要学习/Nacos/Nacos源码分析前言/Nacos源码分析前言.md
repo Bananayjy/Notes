@@ -406,7 +406,7 @@ Nacos2.x版本的架构图
 
 github地址：https://github.com/alibaba/nacos
 
-##### 1、官方提供了两种获取Nacos的渠道：源码和发行包
+##### 1. 官方提供了两种获取Nacos的渠道：源码和发行包
 
 - 源码方式
 
@@ -457,7 +457,9 @@ cd nacos/bin
 
 
 
-##### 2、启动Nacos服务器
+#### 1.4.3 发行包方式启动
+
+##### 1. 启动Nacos服务器
 
 - Linux/Unix/Mac
 
@@ -481,9 +483,7 @@ bash startup.sh -m standalone
 startup.cmd -m standalone
 ```
 
-
-
-##### 3、关闭服务器
+##### 2. 关闭服务器
 
 - Linux/Unix/Mac
 
@@ -499,9 +499,11 @@ shutdown.cmd
 
 或者双击shutdown.cmd运行文件
 
+##### 3. 数据持久化相关配置可参考1.4.4
 
 
-#### 1.4.3、具体搭建过程
+
+#### 1.4.4、使用源码搭建、启动
 
 采用直接获取源码的方式启动nacos，拉取nacos源码到本地
 
@@ -895,6 +897,283 @@ public class DemoApplication {
 到此，我们完成了环境的搭建
 
 
+
+### 1.5、相关问题汇总
+
+#### 1.5.1、java: 程序包com.alibaba.nacos.consistency.entity不存在
+
+场景：
+
+![image-20240829094733139](Nacos%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%89%8D%E8%A8%80.assets/image-20240829094733139.png)
+
+通过nacos将整个项目重新编译一下即可，相关原因可以及参考文章：https://blog.csdn.net/ibigboy/article/details/119413998
+
+> 原因是com.alibaba.nacos.consistency.entity包目录是由[protobuf](https://so.csdn.net/so/search?q=protobuf&spm=1001.2101.3001.7020)在编译时自动生成的
+>
+> 可以通过mvn compile来自动生成他们。如果使用的是IDEA，也可以使用IDEA的protobuf插件。
+
+
+
+#### 1.5.2 中文路径问题
+
+**问题描述：**
+
+配置了单例模式启动
+
+```
+-Dnacos.standalone=true
+```
+
+配置了数据库相关内容
+
+启动后报错
+
+```
+
+
+         ,--.
+       ,--.'|
+   ,--,:  : |                                           Nacos 
+,`--.'`|  ' :                       ,---.               Running in stand alone mode, All function modules
+|   :  :  | |                      '   ,'\   .--.--.    Port: 8848
+:   |   \ | :  ,--.--.     ,---.  /   /   | /  /    '   Pid: 14472
+|   : '  '; | /       \   /     \.   ; ,. :|  :  /`./   Console: http://192.168.56.1:8848/nacos/index.html
+'   ' ;.    ;.--.  .-. | /    / ''   | |: :|  :  ;_
+|   | | \   | \__\/: . ..    ' / '   | .; : \  \    `.      https://nacos.io
+'   : |  ; .' ," .--.; |'   ; :__|   :    |  `----.   \
+|   | '`--'  /  /  ,.  |'   | '.'|\   \  /  /  /`--'  /
+'   : |     ;  :   .'   \   :    : `----'  '--'.     /
+;   |.'     |  ,     .-./\   \  /            `--'---'
+'---'        `--`---'     `----'
+
+2024-08-29 11:26:25.158  INFO 14472 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8848 (http)
+2024-08-29 11:26:25.317  INFO 14472 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2450 ms
+2024-08-29 11:26:27.636  WARN 14472 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'namingHealthController': Unsatisfied dependency expressed through field 'healthOperatorV2'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'healthOperatorV2Impl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\HealthOperatorV2Impl.class]: Unsatisfied dependency expressed through constructor parameter 2; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+2024-08-29 11:26:27.659  INFO 14472 --- [           main] c.a.n.c.l.StartingApplicationListener    : Nacos Log files: C:\Users\23220\nacos\logs
+2024-08-29 11:26:27.660  INFO 14472 --- [           main] c.a.n.c.l.StartingApplicationListener    : Nacos Log files: C:\Users\23220\nacos\conf
+2024-08-29 11:26:27.660  INFO 14472 --- [           main] c.a.n.c.l.StartingApplicationListener    : Nacos Log files: C:\Users\23220\nacos\data
+2024-08-29 11:26:27.660 ERROR 14472 --- [           main] c.a.n.c.l.StartingApplicationListener    : Startup errors : 
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'namingHealthController': Unsatisfied dependency expressed through field 'healthOperatorV2'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'healthOperatorV2Impl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\HealthOperatorV2Impl.class]: Unsatisfied dependency expressed through constructor parameter 2; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:659)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:639)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:953)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:745)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:420)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1317)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306)
+	at com.alibaba.nacos.Nacos.main(Nacos.java:35)
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'healthOperatorV2Impl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\HealthOperatorV2Impl.class]: Unsatisfied dependency expressed through constructor parameter 2; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:656)
+	... 20 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 33 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:315)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:296)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 47 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:224)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:117)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:311)
+	... 61 common frames omitted
+Caused by: java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at com.alipay.sofa.jraft.RaftServiceFactory.createAndInitRaftNode(RaftServiceFactory.java:48)
+	at com.alipay.sofa.jraft.RaftGroupService.start(RaftGroupService.java:129)
+	at com.alibaba.nacos.core.distributed.raft.JRaftServer.createMultiRaftGroup(JRaftServer.java:260)
+	at com.alibaba.nacos.core.distributed.raft.JRaftProtocol.addRequestProcessors(JRaftProtocol.java:163)
+	at com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl.<init>(PersistentClientOperationServiceImpl.java:96)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:211)
+	... 63 common frames omitted
+
+2024-08-29 11:26:27.966  WARN 14472 --- [           main] c.a.nacos.sys.file.WatchFileCenter       : [WatchFileCenter] start close
+2024-08-29 11:26:27.967  WARN 14472 --- [           main] c.a.nacos.sys.file.WatchFileCenter       : [WatchFileCenter] start to shutdown this watcher which is watch : C:\Users\23220\nacos\conf
+2024-08-29 11:26:27.967  WARN 14472 --- [           main] c.a.nacos.sys.file.WatchFileCenter       : [WatchFileCenter] already closed
+2024-08-29 11:26:27.967  WARN 14472 --- [           main] c.a.nacos.common.notify.NotifyCenter     : [NotifyCenter] Start destroying Publisher
+2024-08-29 11:26:27.967  WARN 14472 --- [           main] c.a.nacos.common.notify.NotifyCenter     : [NotifyCenter] Destruction of the end
+2024-08-29 11:26:27.968 ERROR 14472 --- [           main] c.a.n.c.l.StartingApplicationListener    : Nacos failed to start, please see C:\Users\23220\nacos\logs\nacos.log for more details.
+2024-08-29 11:26:27.982  INFO 14472 --- [           main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2024-08-29 11:26:28.013 ERROR 14472 --- [           main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'namingHealthController': Unsatisfied dependency expressed through field 'healthOperatorV2'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'healthOperatorV2Impl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\HealthOperatorV2Impl.class]: Unsatisfied dependency expressed through constructor parameter 2; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:659)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:639)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:953)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:745)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:420)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1317)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306)
+	at com.alibaba.nacos.Nacos.main(Nacos.java:35)
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'healthOperatorV2Impl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\HealthOperatorV2Impl.class]: Unsatisfied dependency expressed through constructor parameter 2; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:656)
+	... 20 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'clientOperationServiceProxy' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\ClientOperationServiceProxy.class]: Unsatisfied dependency expressed through constructor parameter 1; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 33 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'persistentClientOperationServiceImpl' defined in file [D:\codesaver\Banana-project\Banana-Own-Projects\nacos-2.2.0\naming\target\classes\com\alibaba\nacos\naming\core\v2\service\impl\PersistentClientOperationServiceImpl.class]: Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:315)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:296)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1372)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1222)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1389)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1309)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 47 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl]: Constructor threw exception; nested exception is java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:224)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:117)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:311)
+	... 61 common frames omitted
+Caused by: java.lang.IllegalStateException: Fail to init node, please see the logs to find the reason.
+	at com.alipay.sofa.jraft.RaftServiceFactory.createAndInitRaftNode(RaftServiceFactory.java:48)
+	at com.alipay.sofa.jraft.RaftGroupService.start(RaftGroupService.java:129)
+	at com.alibaba.nacos.core.distributed.raft.JRaftServer.createMultiRaftGroup(JRaftServer.java:260)
+	at com.alibaba.nacos.core.distributed.raft.JRaftProtocol.addRequestProcessors(JRaftProtocol.java:163)
+	at com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl.<init>(PersistentClientOperationServiceImpl.java:96)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:211)
+	... 63 common frames omitted
+
+2024-08-29 11:26:28.015  WARN 14472 --- [       Thread-5] c.a.n.common.executor.ThreadPoolManager  : [ThreadPoolManager] Start destroying ThreadPool
+2024-08-29 11:26:28.015  WARN 14472 --- [       Thread-5] c.a.n.common.executor.ThreadPoolManager  : [ThreadPoolManager] Destruction of the end
+Disconnected from the target VM, address: '127.0.0.1:54508', transport: 'socket'
+
+Process finished with exit code 1
+
+```
+
+
+
+**解决：**
+
+配置VM参数：
+
+```
+-Dnacos.home=D:\nacos-2.0.0-bugfix\logs\
+```
+
+
+
+**原因：**
+
+参考文章：
+
+- https://github.com/alibaba/nacos/issues/10870
+
+- https://blog.csdn.net/qq_42857911/article/details/132185015
+
+ 
 
 ## 二、Nacos源码分析文章
 
