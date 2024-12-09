@@ -740,7 +740,11 @@ student表中的聚簇索引的简图如下所示
 
 ##### ②间隙锁（Gap Locks）
 
-MySQL 在 REPEATABLE READ 隔离级别下是可以解决幻读问题的，解决方案有两种，可以使用 MVCC 方案解决，也可以采用 加锁 方案解决。但是在使用加锁方案解决时有个大问题，就是事务在第一次执行读取操作时，那些幻影记录尚不存在，我们无法给这些 幻影记录 加上 记录锁 。InnoDB提出了一种称之为Gap Locks 的锁，官方的类型名称为： LOCK_GAP ，我们可以简称为 gap锁 。比如，把id值为8的那条记录加一个gap锁的示意图如下。
+> 额外参考文章：https://blog.csdn.net/bookssea/article/details/135618275
+
+**简要：**
+
+MySQL 在 REPEATABLE READ 隔离级别下是可以解决幻读问题的。幻读解决方案有两种，可以使用 MVCC 方案解决（读取之前的版本数据），也可以采用 加锁 方案解决（加间隙锁，间隙中防止其他数据的插入，出现幻读）。但是在使用加锁方案解决时有个大问题，就是事务在第一次执行读取操作时，那些幻影记录尚不存在，我们无法给这些 幻影记录 加上 记录锁 。InnoDB提出了一种称之为Gap Locks 的锁，官方的类型名称为： LOCK_GAP ，我们可以简称为 gap锁 。比如，把id值为8的那条记录加一个gap锁的示意图如下。
 
 ![image-20241207143855911](MySQL%E9%94%81.assets/image-20241207143855911.png)
 
@@ -748,7 +752,7 @@ MySQL 在 REPEATABLE READ 隔离级别下是可以解决幻读问题的，解决
 
 gap锁的提出仅仅是为了防止插入幻影记录而提出的。虽然有共享gap锁和 独占gap锁 这样的说法，但是它们起到的作用是相同的。而且如果对一条记录加了gap锁(不论是共享gap锁还是独占gap锁)，并不会限制其他事务对这条记录加记录锁或者继续加gap锁。
 
-具体示例：
+**具体示例：**
 
 示例一：
 
@@ -756,11 +760,11 @@ session1中开启一个查询，并且加上S锁
 
 ![image-20241207144513294](MySQL%E9%94%81.assets/image-20241207144513294.png)
 
-session2中同样对id=5的数据进行查询
+session2中同样对id=5的数据进行查询，加上X锁
 
 ![image-20241207144632722](MySQL%E9%94%81.assets/image-20241207144632722.png)
 
-如上，两个都查询出来了，但是如果将id换成8，那么session2就会查询不出来，因为加的锁不一样（如果id=8的话，sesion2照样可以在3-8的范围内插入记录，因为innodb默认使用的是临界锁，对于主键或唯一索引的查询，InnoDB 不会在查询结果附近加锁范围中的空隙）。如果id=8，session1查询的时候加上一个S锁，而session2加上一个X锁，那么就会被阻塞。但是此时id=5的数据是没有的，加的是一个区间范围为（3,8）的间隙锁，对于共享gao锁和独占gap是不区分的，即lock in share mode 和 for update其是是一样的。因此间隙锁是可以多个去加的。
+如上，两个都查询出来了，但是如果将id换成8，那么session2就会查询不出来，因为加的锁不一样（如果id=8的话，sesion2照样可以在3-8的范围内插入记录，因为innodb默认使用的是临界锁，对于主键或唯一索引的查询，InnoDB 不会在查询结果附近加锁范围中的空隙）。如果id=8，session1查询的时候加上一个S锁，而session2加上一个X锁，那么就会被阻塞。但是此时id=5的数据是没有的，加的是一个区间范围为（3,8）的间隙锁，对于共享gap锁和独占gap是不区分的，即通过lock in share mode 和 for update去添加间隙锁其实是一样的，不会出现X锁之间相互阻塞的情况，因此间隙锁是可以多个去加的。
 
 当我们通过session3去（3,8）区间范围内新增一条记录的时候就会被间隙锁阻塞
 
@@ -770,13 +774,13 @@ session2中同样对id=5的数据进行查询
 
 当我们还行如下命令后会给20到正无穷的记录加上间隙锁，即（20，+无穷）都无法插入记录
 
-```
+```mysql
 select * from student where id = 25 lock in share mode
 ```
 
 但是插入id=17的记录还是可以正常执行的，因为该区间中没有间隙锁。
 
-其实现是通过数据页中的两条伪记录实现爱你的：
+其实现是通过数据页中的两条伪记录实现的：
 
 - Infimum记录，表示该页面中最小的记录
 - Supremum记录，表示该页面中最大的记录
@@ -793,9 +797,176 @@ select * from student where id = 25 lock in share mode
 
 
 
+示例四：
+
+假设有一个名为`products`的表，其中有一个整型列`product_id`作为主键索引。现在有两个[并发](https://marketing.csdn.net/p/3127db09a98e0723b83b2914d9256174?pId=2782&utm_source=glcblog&spm=1001.2101.3001.7020)事务：事务A和事务B
+
+事务A执行以下语句：
+
+```
+BEGIN;
+SELECT * FROM `products` WHERE `product_id` BETWEEN 100 and 200 FOR UPDATE;
+```
+
+事务B执行以下语句：
+
+```
+BEGIN;
+INSERT INTO `products` (`product_id`, `name`) VALUES (150, 'Product 150');
+```
+
+在这种情况下，事务A会在products表中product_id值在 100 和 200 之间的范围上设置间隙锁。因此，在事务A运行期间，其他事务无法在这个范围内插入新的数据，在事务B尝试插入product_id为150的记录时，由于该记录位于事务A锁定的间隙范围内，事务B将被阻塞，直到事务A释放间隙锁为止。
+
+
+
+**间隙锁触发条件**
+
+在其他隔离级别下，如读提交（Read Committed）隔离级别，MySQL可能会使用临时的意向锁来避免并发问题，而不是生成真正的间隙锁。在可重复读（Repeatable Read）事务隔离级别下，以下情况会产生间隙锁：
+
+- 使用普通索引锁定：当一个事务使用普通索引进行条件查询时，MySQL会在满足条件的索引范围之间的间隙上生成间隙锁。
+
+- 使用多列唯一索引：如果一个表存在多列组成的唯一索引，并且事务对这些列进行条件查询时，MySQL会在满足条件的索引范围之间的间隙上生成间隙锁。
+- 使用唯一索引锁定多行记录：当一个事务使用唯一索引来锁定多行记录时，MySQL会在这些记录之间的间隙上生成间隙锁，以确保其他事务无法在这个范围内插入新的数据。
+
+为什么这里强调的是普通索引呢？因为对唯一索引锁定并不会触发间隙锁，请看下面这个例子：
+
+假设我们有一个名为students的表，其中有两个字段：id 和 name。id是主键，现在有两个事务同时进行操作：
+
+事务A执行以下语句：
+
+```
+SELECT * FROM students WHERE id = 1 FOR UPDATE;
+```
+
+事务B执行以下语句：
+
+```
+INSERT INTO students (id, name) VALUES (2, 'John');
+```
+
+由于事务A使用了唯一索引锁定，它会锁定id为1的记录，不会触发间隙锁。同时，在事务B中插入id为2的记录也不会受到影响。这是因为唯一索引只会锁定匹配条件的具体记录，而不会锁定不存在的记录（如间隙）。
+
+因此总结得出，当使用唯一索引锁定一条存在的记录时，会使用记录锁，而不是间隙锁
+
+但是当搜索条件仅涉及到多列唯一索引的一部分列时，可能会产生间隙锁。以下是一个例子：
+
+假设students表，包含三个列：id、name和age。我们在(name, age)上创建了一个唯一索引。
+
+现在有两个事务同时进行操作：
+
+事务A执行以下语句：
+
+```
+SELECT * FROM students WHERE name = 'John' FOR UPDATE;
+```
+
+事务B执行以下语句：
+
+```
+INSERT INTO students (id, name, age) VALUES (2, 'John', 25);
+```
+
+在这种情况下，事务A搜索的条件只涉及到了唯一索引的一部分列（name），而没有涉及到完整的索引列（name, age）。因此，MySQL会对匹配的记录加上行锁，并且还会对与该条件范围相邻的间隙加上间隙锁。
+
+
+
+**间隙锁加锁规则：**
+
+- 规则1：加锁的基本单位是 Next-Key Lock，左开右闭区间。
+
+- 规则2：查找过程中访问到的对象才会加锁。
+- 规则3：唯一索引上的范围查询会上锁到不满足条件的第一个值为止。
+- 规则4：唯一索引等值查询，并且记录存在，Next-Key Lock 退化为行锁。
+- 规则5：索引上的等值查询，会将距离最近的左边界和右边界作为锁定范围，如果索引不是唯一索引还会继续向右匹配，直到遇见第一个不满足条件的值，如果最后一个值不等于查询条件，Next-Key Lock 退化为间隙锁。
+
+
+
+具体演示：
+
+环境：MySQL，InnoDB，RR隔离级别。
+
+数据表：
+
+```
+CREATE TABLE `user` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `age` int DEFAULT NULL,
+  `name` varchar(32) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+   KEY `age` (`age`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+数据：
+
+```
+id	age	name
+1	1	小明
+5	5	小王
+7	7	小张
+11	11	小陈
+```
+
+在进行测试之前，我们先来看看 user 表中存在的隐藏间隙：
+
+```
+(-∞, 1]
+(1, 5]
+(5, 7]
+(7, 11]
+(11, +∞]
+```
+
+案例一：唯一索引等值锁定存在的数据
+如下是事务A和事务B执行的顺序：
+
+![image-20241210005030608](MySQL%E9%94%81.assets/image-20241210005030608.png)
+
+
+
+根据规则4，加的是记录锁，不会使用间隙锁，所以只会锁定 5 这一行记录。
+
+案例二：索引等值锁定
+![image-20241210005038958](MySQL%E9%94%81.assets/image-20241210005038958.png)
+这是一个索引等值查询，根据规则1和规则5，加锁范围是（ 1，5 ] ，又由于向右遍历时最后一个值 5 不满足查询需求，Next-Key Lock 退化为间隙锁。也就是最终锁定范围区间是 （ 1，5 )。
+
+案例三：唯一索引范围锁定
+![image-20241210005045812](MySQL%E9%94%81.assets/image-20241210005045812.png)
+根据规则3，会上锁到不满足条件的第一个值为止，也就是7，所以最终加锁范围是 [ 5，7 ]。
+
+其实这里可以分为两个步骤，第一次用 id=5 定位记录的时候，其实加上了间隙锁 （ 1，5 ]，又因为是唯一索引等值查询，所以退化为了行锁，只锁定 5。
+
+第二次用 id<6 定位记录的时候，其实加上了间隙锁（ 5，7 ]，所以最终合起来锁定区间是 [ 5，7 ]。
+
+案例四：非唯一索引范围锁定
+![image-20241210005054565](MySQL%E9%94%81.assets/image-20241210005054565.png)
+参考上面那个例子。
+
+第一次用 age =5 定位记录的时候，加上了间隙锁 （ 1，5 ]，不是唯一索引，所以不会退化为行锁，根据规则5，会继续向右匹配，所以最终合起来锁定区间是 （ 1，7 ]。
+
+案例五：间隙锁死锁
+![image-20241210005104982](MySQL%E9%94%81.assets/image-20241210005104982.png)
+间隙锁之间不是互斥的，如果一个事务A获取到了（ 1,5 ] 之间的间隙锁，另一个事务B仍然可以获取到（ 1,5 ] 之间的间隙锁。这时就可能会发生死锁问题。
+
+在事务A事务提交，间隙锁释放之前，事务B也获取到了间隙锁（ 1,5 ] ，这时两个事务就处于死锁状态。
+
+案例六：limit对加锁的影响
+![image-20241210005113401](MySQL%E9%94%81.assets/image-20241210005113401.png)
+根据规则5，锁定区间应该是 ( 5，7 ]，但是因为加了 limit 1 的限制，因此在遍历到 age=6 这一行之后，循环就结束了。
+
+根据规则2，查找过程中访问到的对象才会加锁，所以最终锁定区间应该是：( 5，6 ]。
+
+
+
+
+
 ##### ③ 临键锁（Next-Key Locks）
 
- 有时候我们既想 锁住某条记录 ，又想 阻止 其他事务在该记录前边的 间隙插入新记录，所以InnoDB就提出了一种称之为 Next-Key Locks的锁，官方的类型名称为: LOCK_ORDINARY，我们也可以简称为next-key锁。Next-KeyLocks是在存储引擎 innodb 、事务级别在 可重复读 的情况下使用的数据库锁，innodb默认的锁就是Next-Kevlocks（所以上面的记录锁和间隙锁可以演示出来）。比如，我们把id值为8的那条记录加一个next-key锁的示意图如下：
+> 参考文章：https://blog.csdn.net/wang11yangyang/article/details/118087876
+
+ 有时候我们既想 锁住某条记录 ，又想 阻止 其他事务在该记录前边的 间隙插入新记录，所以InnoDB就提出了一种称之为 Next-Key Locks的锁，官方的类型名称为: LOCK_ORDINARY，我们也可以简称为next-key锁（是记录锁和间隙锁的组合，它在索引范围内的记录上加上记录锁，并在索引范围之间的间隙上加上间隙锁。这样可以避免幻读（Phantom Read）的问题，确保事务的隔离性）。Next-KeyLocks是在存储引擎 innodb 、事务级别在 可重复读 的情况下使用的数据库锁，innodb默认的锁就是Next-Kevlocks（所以上面的记录锁和间隙锁可以演示出来）。切记：间隙锁的区间是左开右开的，临键锁的区间是左开右闭的。
+
+比如，我们把id值为8的那条记录加一个next-key锁的示意图如下：
 
 ![image-20241207153719716](MySQL%E9%94%81.assets/image-20241207153719716.png)
 
@@ -824,6 +995,31 @@ session2查询id=8的数据，并加S锁同样阻塞（因为session1加的是X�
 session2在（3,8）插入数据同样阻塞
 
 ![image-20241207155002172](MySQL%E9%94%81.assets/image-20241207155002172.png)
+
+
+
+**Net-Key Lock的规则**
+
+```
+原则 1：加锁的基本单位是 next-key lock。next-key lock 是前开后闭区间。
+原则 2：只有访问到的对象才会加锁。
+优化 1：索引上的等值查询，
+    命中唯一索，退化为行锁。
+    命中普通索引，左右两边的GAP Lock + Record Lock。
+优化 2：
+    索引上的等值查询，未命中，所在的Net-Key Lock，退化为GAP Lock 。
+索引在范围查询： 
+    1.等值和范围分开判断。
+    2.索引在范围查询的时候 都会访问到所在区间不满足条件的第一个值为止。
+    3.如果使用了倒叙排序，按照倒叙排序后，
+    检索范围的右边多加一个GAP。
+    哪个方向还有命中的等值判断，再向同方向拓展外开里闭的区间。
+
+```
+
+
+
+
 
 
 
@@ -1068,23 +1264,42 @@ Innodb存储引擎中的锁结果如下所示：
 
 - type_mode
 
-![image-20241209000508306](MySQL%E9%94%81.assets/image-20241209000508306.png)
+这是一个32位的数，被分成了 lock_mode、lock_type 和rec_lock_type 三个部分，如图所示:
 
-![image-20241209000526448](MySQL%E9%94%81.assets/image-20241209000526448.png)
+![image-20241209212647440](MySQL%E9%94%81.assets/image-20241209212647440.png)
 
-![image-20241209000542125](MySQL%E9%94%81.assets/image-20241209000542125.png)
+（1）锁的模式(lock_mode)，占用低4位，可选的值如下：
 
-（7、8位没有使用）
+> LOCK_IS (十进制的 0): 表示共享意向锁，也就是 IS锁 。
+> LOCK_IX (十进制的1): 表示独占意向锁，也就是 IX锁 。
+> LOCK_S (十进制的 2): 表示共享锁，也就是 S锁 。
+> LOCK_X(十进制的 3): 表示独占锁，也就是 X锁 。
+> LOCK_AUTO_INC(十进制的4): 表示 AUTO-INC锁。
 
-![image-20241209000610178](MySQL%E9%94%81.assets/image-20241209000610178.png)
+在InnoDB存储引擎中，LOCK_IS，LOCK_IX，LOCK_AUTO_INC都算是表级锁的模式，LOCK_S和LOCK_X既可以算是表级锁的模式，也可以是行级锁的模式。
 
-![image-20241209000639948](MySQL%E9%94%81.assets/image-20241209000639948.png)
+（2）锁的类型(lock_type)，占用第5~8位，不过现阶段只有第5位和第6位被使用（7、8位没有使用）
+> LOCK_TABLE(十进制的16)，也就是当第5个比特位置为1时，表示表级锁。
+> LOCK_REC(十进制的 32)，也就是当第6个比特位置为1时，表示行级锁
 
-- 其他信息
+（3）行锁的具体类型(rec_lock_type)，使用其余的位来表示。只有在 lock_type 的值为 LOCK_REC 时，也就是只有在该锁为行级锁时，才会被细分为更多的类型:
+
+> LOCK_ORDINARY(十进制的0):表示next-key锁。
+> LOCK_GAP(十进制的512):也就是当第10个比特位置为1时，表示gap锁 。
+> LOCK_REC_NOT_GAP(十进制的1024):也就是当第11个比特位置为1时，表示正经记录锁 。LOCK_INSERT_INTENTION(十进制的2048):也就是当第12个比特位置为1时，表示插入意向锁。
+>
+> 其他中的类型:还有一些不常用的类型我们就不多说了。
+
+（4）is_waiting 属性基于内存空间的节省，所以把 is_waiting 属性放到了 type_mode 这个32位的数字
+中
+
+> LOCK_WAIT(十进制的256):当第9个比特位置为1时，表示is_waiting为true，也就是当前事务尚未获取到锁，处在等待状态;当这个比特位为0时，表示is_waiting为false，也就是当前事务获取锁成功
+
+（5）其他信息
 
 为了更好的管理系统运行过程中生成的各种锁结构而设计了各种哈希表和链表。
 
-- 一堆比特位
+（6）一堆比特位
 
 如果是 行锁结构 的话，在该结构末尾还放置了一堆比特位，比特位的数量是由上边提到的n_bits 属性表示的,。InnoDB数据页中的每条记录在 记录头信息中都包含一个heap_no属性，伪记录 Infimum的 heap_no 值为8，Supremum 的 heap_no 值为1，之后每插入一条记录，heap_no 值就增1。锁结构最后的一堆比特位就对应着-个页面中的记录，一个比特位映射一个heap_no，即一个比特位映射到页内的一条记录。
 
@@ -1096,17 +1311,52 @@ Innodb存储引擎中的锁结果如下所示：
 
 ## 四、锁监控
 
+### 4.1 方式一
+
+关于MySQL锁的监控，我们一般可以通过检査 InnoDB_row_lock 等状态变量来分析系统上的行锁的争夺情况
+
+![image-20241209223256490](MySQL%E9%94%81.assets/image-20241209223256490.png)
+
+对各个状态量的说明如下:
+
+- Innodb_row_lock_current_waits:当前正在等待锁定的数量;
+- Innodb_row_lock_time:从系统启动到现在锁定总时间长度;(等待总时长)
+- Innodb_row_lock_time_avg:每次等待所花平均时间;(等待平均时长)
+- Innodb_row_lock_time_max:从系统启动到现在等待最常的一次所花的时间;。
+- Innodb_row_lock_waits:系统启动后到现在总共等待的次数;(等待总次数)对于这5个状态变量，比较重要的3个见上面(橙色)。尤其是当等待次数很高，而且每次等待时长也不小的时候，我们就需要分析系统中为什么会有如此多的等待，然后根据分析结果着手指定优化计划。
+
+### 4.2 其他方法
+
+MySQL把事务和锁的信息记录在了 information_schema库中，涉及到的三张表分别是 INNODB_TRX、INNODB_LOCKS（被performance_schema.data_locks替代）和INNODB_LOCK_WAITS（被performance_schema.data_lock_waits替代） 。
+MySQL5.7及之前 ，可以通过information_schema.INNODB_LOCKS查看事务的锁情况，但只能看到阻塞事务的锁如果事务并未被阻塞，则在该表中看不到该事务的锁情况。
+MySOL8.0删除了information_schema.INNODB LOCKS,添加了performance_schema.data_locks，可以通过performance_schema.data_locks查看事务的锁情况，和MySQL5.7及之前不同，performance_schema.data_locks不但可以看到阻寒该事务的锁，还可以看到该事务所持有的锁。
+同时，information_schema.INNODB_LOCK_WAlTS也被performance_schema.data_lock_waits 所代替
+我们模拟一个锁等待的场景，以下是从这三张表收集的信息
+锁等待场景，我们依然使用记录锁中的案例，当事务2进行等待时，查询情况如下:
+
+具体实例：
+
+session1
+
+![image-20241209230249183](MySQL%E9%94%81.assets/image-20241209230249183.png)
+
+session2
+
+![image-20241209230249183](MySQL%E9%94%81.assets/image-20241209230249183.png)
+
+session3查看INNODB_TRX
+
+![image-20241209230324524](MySQL%E9%94%81.assets/image-20241209230324524.png)
+
+如果使用information_schema.INNODB_LOCKS，无法查看到session1事务的锁，只能看到session2事务中发生阻塞的锁。查看performance_schema.data_locks不但可以看到阻寒该事务的锁，还可以看到该事务所持有的锁。
 
 
 
 
 
+## 五、问题汇总
 
-
-
-## 四、问题汇总
-
-#### 3.1 select * from student where id = 8 和 select * from student where id = 8 lock in share mode 和 select * from student where id = 8 for update的区别
+### 5.1 select * from student where id = 8 和 select * from student where id = 8 lock in share mode 和 select * from student where id = 8 for update的区别
 
 在 MySQL 中，`SELECT` 查询语句中的 `LOCK IN SHARE MODE` 和 `FOR UPDATE` 是用来控制对数据库表中数据的锁定行为的，尤其是在事务处理中。它们的主要区别在于锁定的粒度和目的。下面详细说明这三种查询的区别。
 
@@ -1164,7 +1414,21 @@ Innodb存储引擎中的锁结果如下所示：
 
 
 
-#### 3.2 mysql中innodb默认使用的是临界锁，现在有一个表，里面有id=8的数据，我执行select * from student where id = 8 for update，会在8的前面加间隙锁吗
+### 5.2 mysql中innodb在RR事务隔离级别下间隙锁的深入学习
+
+### 1、关于间隙锁的规则
+
+
+
+
+
+
+
+
+
+现在有一个表，里面有id=8的数据，我执行select * from student where id = 8 for update，会在8的前面加间隙锁吗
+
+### 1、说明
 
 1. **如果 `id` 是主键或唯一索引**：
    - **不会加间隙锁**。当你执行 `SELECT ... FOR UPDATE` 查询时，InnoDB 会为符合条件的行加 **排他锁**（Exclusive Lock）。在这种情况下，`id = 8` 的行会被加上排他锁，其他事务不能修改或删除该行，但 **不会加间隙锁**。这是因为主键或唯一索引的查询通常可以直接定位到一行数据，InnoDB 不需要使用间隙锁。
@@ -1184,6 +1448,8 @@ Innodb存储引擎中的锁结果如下所示：
 通过理解这些机制，你可以控制 MySQL 锁的行为，确保在并发环境中数据的一致性和隔离性。如果你对锁的行为有进一步的疑问，或者在其他场景下有锁定需求，可以进一步讨论。
 
 
+
+#### 2、示例
 
 如果 `id` 是 **非唯一索引**的间隙锁添加示例：
 
@@ -1209,11 +1475,11 @@ session1
 
 ![image-20241207161948457](MySQL%E9%94%81.assets/image-20241207161948457.png)
 
-session2在1到8中间插入数据阻塞
+session2在1到8中间插入数据，发生阻塞
 
 ![image-20241207162128890](MySQL%E9%94%81.assets/image-20241207162128890.png)
 
-session2在8到50中间插入数据阻塞
+session2在8到50中间插入数据，发生阻塞
 
 ![image-20241207162209430](MySQL%E9%94%81.assets/image-20241207162209430.png)
 
@@ -1249,66 +1515,7 @@ session2在小于8的间隙插入数据，其没有间隙锁
 
 
 
-
-
-#### 3.3 其他
-
-问题：
-
-- mysql中如下方式查询不到？
-
-```
--- 1. 开始一个会话，确保没有未提交的事务
-LOCK TABLES test WRITE;
-
--- 2. 查询数据
-SELECT * FROM test;  -- 这里应该能返回数据
-
--- 3. 解锁
-UNLOCK TABLES;
-```
-
-1.查询 √
-
-通过命令`select * from test`查看表的信息
-
-![image-20241016233018532](MySQL%E9%94%81.assets/image-20241016233018532.png)
-
-2.更新、删除 ×
-
-通过命令`update test set name = 'ww'`更新表信息
-
-![image-20241016233125660](MySQL%E9%94%81.assets/image-20241016233125660.png)
-
-通过命令`unlock tables;`解锁表的锁
-
-
-
-- 通过命令`lock tables test write`给test表上表级别的X锁
-
-通过命令`show open tables where in_use > 0;`查看上锁的表
-
-![image-20241016232449234](MySQL%E9%94%81.assets/image-20241016232449234.png)
-
-1.查询 ×
-
-通过命令`select * from test`查看表的信息
-
-无法查询到表中的数据
-
-
-
-2.更新、删除 ×
-
-通过命令`update test set name = 'ww'`更新表信息
-
-![image-20241016233125660](MySQL%E9%94%81.assets/image-20241016233125660.png)
-
-无法更新表中的数据
-
-通过命令`unlock tables;`解锁表的锁
-
-
+##
 
 
 
@@ -1325,3 +1532,11 @@ UNLOCK TABLES;
 #### 资料：
 
 > https://blog.csdn.net/qq_45732909/article/details/140978690?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522a1c433e8c86d7a906ce6680587a8fa71%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=a1c433e8c86d7a906ce6680587a8fa71&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-2-140978690-null-null.142^v100^pc_search_result_base6&utm_term=Mysql%E5%9C%A8RR%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E4%BD%BF%E7%94%A8%E7%9A%84%E9%94%81&spm=1018.2226.3001.4187
+
+
+
+
+
+各个隔离级别下的锁机制的使用
+
+> https://blog.csdn.net/sco5282/article/details/135274345
