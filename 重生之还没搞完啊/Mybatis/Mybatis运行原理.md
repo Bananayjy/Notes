@@ -576,7 +576,7 @@ public void parseStatementNode() {
 }
 ```
 
-其将增删改查每一个标签中的所有属性都及诶西出来，最后通过builderAssistant.addMappedStatement方法将其封装成一个mappedStatement（即一个mappedStatement就代表一个增删改查标签的详细信息）
+其将增删改查每一个标签中的所有属性都解析出来，最后通过builderAssistant.addMappedStatement方法将其封装成一个mappedStatement（即一个mappedStatement就代表一个增删改查标签的详细信息）
 
 在addMappedStatement方法中，会将MappedStatement对象也加入到configuration中，如下所示
 
@@ -645,7 +645,7 @@ public SqlSessionFactory build(Configuration config) {
 
 
 
-整个流程时序图如下所示：
+**整个流程时序图：**
 
 ![image-20241226002204607](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20241226002204607.png)
 
@@ -750,7 +750,7 @@ public Executor newExecutor(Transaction transaction, ExecutorType executorType) 
 
 ![image-20241226004448082](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20241226004448082.png)
 
-其中会通过`(Executor) interceptorChain.pluginAll(executor)`方法，调用所有拦截器，包装我们的执行器对象，即executor
+最后会通过`(Executor) interceptorChain.pluginAll(executor)`方法，调用所有拦截器，包装我们的执行器对象，即executor
 
 ```java
 public Object pluginAll(Object target) {
@@ -761,8 +761,605 @@ public Object pluginAll(Object target) {
 }
 ```
 
-
-
-整个过程流程图如下所示：
+**整个过程流程图：**
 
 ![image-20241226004914263](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20241226004914263.png)
+
+
+
+### 2.3 getMapper获取接口代理/实现对象
+
+在2.2获取到DefaultSqlSession后，会通过其对象调用getMapper方法，获取对应接口的代理/实现对象
+
+```java
+DemoMapper mapper = openSession.getMapper(DemoMapper.class);
+```
+
+其本质上调用的是DefaultSqlSession中维护的configuration对象的getMapper方法，方法传递需要代理对象的class对象（type）和当前的DefaultSqlSession对象（this）
+
+```java
+@Override
+public <T> T getMapper(Class<T> type) {
+    return configuration.getMapper(type, this);
+}
+```
+
+configuration对象的getMapper方法又去调用mapperRegistry的getMapper的方法
+
+> mapperRegistry对象是configuration对象中一个重要竖向，其中维护了一个knownMappers对象（HashMap），存放的是每一个mapper对应的mapper代理工厂
+>
+> ![image-20250101160257901](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101160257901.png)
+
+```java
+public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    return mapperRegistry.getMapper(type, sqlSession);
+}
+```
+
+关于mapperRegistry的getMapper方法如下所示
+
+```java
+public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    // 从knownMappers对象中根据mapper接口类型获取对应mapper的代理工厂
+    final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
+    // 未获取到对应的mapper代理工程，直接报错
+    if (mapperProxyFactory == null) {
+        throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
+    }
+    try {
+        // 调用mapper的代理工厂代理工程的newInstance方法，并传入sqlSession对象
+      return mapperProxyFactory.newInstance(sqlSession);
+    } catch (Exception e) {
+      throw new BindingException("Error getting mapper instance. Cause: " + e, e);
+    }
+}
+```
+
+mapperProxyFactory的newInstance方法如下所示
+
+```java
+public T newInstance(SqlSession sqlSession) {
+    // 创建mapperProxy对象（是一个InvocationHandler）
+    final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface, methodCache);
+    // 创建代理对象
+    return newInstance(mapperProxy);
+}
+```
+
+关于MapperProxy，其实现了InvocationHandler接口，InvocationHandler接口用于实现动态代理。
+
+![image-20250101160830161](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101160830161.png)
+
+最后通过newInstance方法，使用java.lang包下的Proxy创建代理对象
+
+```java
+protected T newInstance(MapperProxy<T> mapperProxy) {
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+}
+```
+
+可以看到返回的对象又包含sqlSession对象（defaultSqlSession实行类，通过其中的execute去执行增删改查操作），以及接口代理对象
+
+![image-20250101161139722](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101161139722.png)
+
+
+
+**整个执行过程：**
+
+![image-20250101161225209](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101161225209.png)
+
+
+
+### 2.4 执行增删改查方法
+
+首先调用2.3中获取到的代理对象的getById方法，对指定id的数据进行查询
+
+```mysql
+Demo demo = mapper.getById(1);
+```
+
+因为其实一个InvocationHandler接口的实现，因此会先调用invoke方法
+
+```java
+@Override
+public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    try {
+        // 当前调用方法是不是Object类的，而不是接口指定的方法
+        if (Object.class.equals(method.getDeclaringClass())) {
+            // 直接执行
+            return method.invoke(this, args);
+        }
+        // 在调用invoke方法前，会先调用cachedInvoker方法对method进行包装为MapperMethod （a）
+        // 然后调用invoke方法调用mapperMethod的execute方法进行执行 （b）
+        return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
+    } catch (Throwable t) {
+        throw ExceptionUtil.unwrapThrowable(t);
+    }
+}
+```
+
+method.getDeclaringClass()可以看出当前getById是DemoMapper接口的，而不是Object接口的（如toString等方法）
+
+![image-20250101161930560](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101161930560.png)
+
+（a）调用cachedInvoker方法对method进行包装为MapperMethod 
+
+可以看到其通过new MapperMethod方法创建了一个MapperMethod 对象，并且外面又通过new PlainMethodInvoker构造函数，包了一层PlainMethodInvoker对象
+
+```java
+private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
+    try {
+        return MapUtil.computeIfAbsent(methodCache, method, m -> {
+            if (!m.isDefault()) {
+                return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
+            }
+            try {
+                if (privateLookupInMethod == null) {
+                    return new DefaultMethodInvoker(getMethodHandleJava8(method));
+                }
+                return new DefaultMethodInvoker(getMethodHandleJava9(method));
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException
+                     | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    } catch (RuntimeException re) {
+        Throwable cause = re.getCause();
+        throw cause == null ? re : cause;
+    }
+}
+```
+
+（b）调用invoke方法调用mapperMethod的execute方法进行执行
+
+```java
+interface MapperMethodInvoker {
+    Object invoke(Object proxy, Method method, Object[] args, SqlSession sqlSession) throws Throwable;
+}
+```
+
+此时实现类是PlainMethodInvoker，即调用的PlainMethodInvoker中的invoke方法，其调用的是mapperMethod的execute方法
+
+![image-20250101162804933](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101162804933.png)
+
+mapperMethod的execute方法如下所示
+
+```java
+public Object execute(SqlSession sqlSession, Object[] args) {
+    Object result;
+    // 首先判断SQL的类型（增删改查）
+    switch (command.getType()) {
+        case INSERT: {
+            Object param = method.convertArgsToSqlCommandParam(args);
+            result = rowCountResult(sqlSession.insert(command.getName(), param));
+            break;
+        }
+        case UPDATE: {
+            Object param = method.convertArgsToSqlCommandParam(args);
+            result = rowCountResult(sqlSession.update(command.getName(), param));
+            break;
+        }
+        case DELETE: {
+            Object param = method.convertArgsToSqlCommandParam(args);
+            result = rowCountResult(sqlSession.delete(command.getName(), param));
+            break;
+        }
+        case SELECT:
+            if (method.returnsVoid() && method.hasResultHandler()) {
+                // 返回空的如何执行
+                executeWithResultHandler(sqlSession, args);
+                result = null;
+            } else if (method.returnsMany()) {
+                // 返回多个参数的如何执行
+                result = executeForMany(sqlSession, args);
+            } else if (method.returnsMap()) {
+                // 返回map的如何执行
+                result = executeForMap(sqlSession, args);
+            } else if (method.returnsCursor()) {
+                // 返回cursor的如何执行
+                result = executeForCursor(sqlSession, args);
+            } else {
+                // 其他的如何执行
+                Object param = method.convertArgsToSqlCommandParam(args);
+                result = sqlSession.selectOne(command.getName(), param);
+                if (method.returnsOptional() && (result == null || !method.getReturnType().equals(result.getClass()))) {
+                    result = Optional.ofNullable(result);
+                }
+            }
+            break;
+        case FLUSH:
+            result = sqlSession.flushStatements();
+            break;
+        default:
+            throw new BindingException("Unknown execution method for: " + command.getName());
+    }
+    if (result == null && method.getReturnType().isPrimitive() && !method.returnsVoid()) {
+        throw new BindingException("Mapper method '" + command.getName()
+                                   + "' attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
+    }
+    return result;
+}
+```
+
+当前首先会进入最后一个判断条件，即else条件，首先调用的是MpperMethod方法的convertArgsToSqlCommandParam的方法
+
+```
+Object param = method.convertArgsToSqlCommandParam(args);
+```
+
+其调用的是paramNameResolver的convertArgsToSqlCommandParam的方法
+
+```java
+public Object convertArgsToSqlCommandParam(Object[] args) {
+  return paramNameResolver.getNamedParams(args);
+}
+```
+
+其源码如下所示，即包装参数为一个map对象或是直接返回
+
+```java
+public Object getNamedParams(Object[] args) {
+    final int paramCount = names.size();
+    if (args == null || paramCount == 0) {
+        return null;
+    }
+    if (!hasParamAnnotation && paramCount == 1) {
+        Object value = args[names.firstKey()];
+        return wrapToMapIfCollection(value, useActualParamName ? names.get(names.firstKey()) : null);
+    } else {
+        final Map<String, Object> param = new ParamMap<>();
+        int i = 0;
+        for (Map.Entry<Integer, String> entry : names.entrySet()) {
+            param.put(entry.getValue(), args[entry.getKey()]);
+            // add generic param names (param1, param2, ...)
+            final String genericParamName = GENERIC_NAME_PREFIX + (i + 1);
+            // ensure not to overwrite parameter named with @Param
+            if (!names.containsValue(genericParamName)) {
+                param.put(genericParamName, args[entry.getKey()]);
+            }
+            i++;
+        }
+        return param;
+    }
+}
+```
+
+然后调用sqlSession对象（defualtSqlSession）的selectOne方法（不同的返回类型调用不同的方法，如有多个返回参数，调用的时sqlSession的selectList方法），并将command.getName()即方法名称和上面包装的参数传入。
+
+调用的DefualtSqlSession方法的selectList如下所示，虽然是调用单个，但本质上还是调用的selectList方法，只不过只返回其中的第一个。如果有多个直接抛出异常
+
+```java
+@Override
+public <T> T selectOne(String statement, Object parameter) {
+    // Popular vote was to return null on 0 results and throw exception on too many.
+    List<T> list = this.selectList(statement, parameter);
+    if (list.size() == 1) {
+        return list.get(0);
+    }
+    if (list.size() > 1) {
+        throw new TooManyResultsException(
+            "Expected one result (or null) to be returned by selectOne(), but found: " + list.size());
+    } else {
+        return null;
+    }
+}
+```
+
+selectList会调用其重载的方法
+
+```java
+@Override
+public <E> List<E> selectList(String statement, Object parameter) {
+	return this.selectList(statement, parameter, RowBounds.DEFAULT);
+}
+```
+
+```java
+private <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds, ResultHandler handler) {
+    try {
+        // 获取到对应接口方法对应的封装了的xml中配置的增删改查标签详细信息
+        MappedStatement ms = configuration.getMappedStatement(statement);
+        dirty |= ms.isDirtySelect();
+        // 调用executor的query方法
+        return executor.query(ms, wrapCollection(parameter), rowBounds, handler);
+    } catch (Exception e) {
+        throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
+    } finally {
+        ErrorContext.instance().reset();
+    }
+}
+```
+
+在调用executor的query方法的时候，又会调用wrapCollection对已经包装的参数再进行一次包装，其如下所示，其调用的也是ParamNameResolver的wrapToMapIfCollection方法
+
+```java
+private Object wrapCollection(final Object object) {
+    return ParamNameResolver.wrapToMapIfCollection(object, null);
+}
+```
+
+该方法本质上就是包装集合的过程，将集合放到map对象中，并返回
+
+```java
+public static Object wrapToMapIfCollection(Object object, String actualParamName) {
+    if (object instanceof Collection) {
+        ParamMap<Object> map = new ParamMap<>();
+        map.put("collection", object);
+        if (object instanceof List) {
+            map.put("list", object);
+        }
+        Optional.ofNullable(actualParamName).ifPresent(name -> map.put(name, object));
+        return map;
+    }
+    if (object != null && object.getClass().isArray()) {
+        ParamMap<Object> map = new ParamMap<>();
+        map.put("array", object);
+        Optional.ofNullable(actualParamName).ifPresent(name -> map.put(name, object));
+        return map;
+    }
+    return object;
+}
+```
+
+最后调用的CachingExecutor的query方法
+
+```java
+@Override
+public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)
+    throws SQLException {
+    BoundSql boundSql = ms.getBoundSql(parameterObject);
+    CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+    return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+}
+```
+
+首先从MappedStatement对象中获取绑定的sql对象信息，即BoundSql对象（即sql的详细信息）
+
+> sql: sql语句
+>
+> parameterMappings：参数在sql中映射关系
+>
+> parameterObject： 参数值
+>
+> additionalParameters：额外参数
+>
+> metaParameters:……
+
+![image-20250101165105795](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101165105795.png)
+
+之后，通过createCacheKey，获取到缓存需要保存的key（很长，方法id+sql+参数……）
+
+```
+CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+```
+
+再调用query的重载方法
+
+```
+query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+```
+
+```java
+@Override
+public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler,
+                         CacheKey key, BoundSql boundSql) throws SQLException {
+    // 从MappedStatement中获取缓存
+    Cache cache = ms.getCache();
+    // 如果有缓存的执行逻辑，即二级缓存
+    if (cache != null) {
+        flushCacheIfRequired(ms);
+        if (ms.isUseCache() && resultHandler == null) {
+            ensureNoOutParams(ms, boundSql);
+            @SuppressWarnings("unchecked")
+            List<E> list = (List<E>) tcm.getObject(cache, key);
+            if (list == null) {
+                list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+                tcm.putObject(cache, key, list); // issue #578 and #116
+            }
+            return list;
+        }
+    }
+    // 因为当前对象是CacheExecutor，是对Executor对象的包装，因此其实际调用的还是之前执行对象，即SimpleExecutor的query方法
+    return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+}
+```
+
+实际调用的SimpleExecutor父类BaseExecutor的query方法（SimpleExecutor没有重写该方法）
+
+![image-20250101165826990](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101165826990.png)
+
+```java
+@Override
+public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler,
+                         CacheKey key, BoundSql boundSql) throws SQLException {
+    // 获取资源
+    ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+    if (closed) {
+        throw new ExecutorException("Executor was closed.");
+    }
+    if (queryStack == 0 && ms.isFlushCacheRequired()) {
+        clearLocalCache();
+    }
+    List<E> list;
+    try {
+        queryStack++;
+        // 从本地缓存中获取对应的结果值（localCache.getObject(key)）即一级缓存
+        list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
+        if (list != null) {
+            handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+        } else {
+            // 如果一级缓存中没有缓存，调用queryFromDatabase方法
+            list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
+        }
+    } finally {
+        queryStack--;
+    }
+    if (queryStack == 0) {
+        for (DeferredLoad deferredLoad : deferredLoads) {
+            deferredLoad.load();
+        }
+        // issue #601
+        deferredLoads.clear();
+        if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
+            // issue #482
+            clearLocalCache();
+        }
+    }
+    return list;
+}
+```
+
+queryFromDatabase方法如下所示
+
+```java
+private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds,
+                                      ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+    List<E> list;
+    // 先将key放到本地缓存中，并且其值为一个占位符EXECUTION_PLACEHOLDER
+    localCache.putObject(key, EXECUTION_PLACEHOLDER);
+    try {
+        list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+    } finally {
+        localCache.removeObject(key);
+    }
+    // 查出数据后，将list结果放到上面的占位符中
+    localCache.putObject(key, list);
+    if (ms.getStatementType() == StatementType.CALLABLE) {
+        localOutputParameterCache.putObject(key, parameter);
+    }
+    return list;
+}
+```
+
+其中通过`list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);`去进行查询
+
+> ms: 当前增删改查标签的详细信息
+>
+> parameter：入参
+>
+> rowBounds：逻辑分页
+>
+> resultHandler：结果处理
+>
+> boundSql：sql语句详细信息
+
+这个doQuery调用的就是SimpleExecutor的Query方法，如下所示
+
+```java
+@Override
+public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler,
+                           BoundSql boundSql) throws SQLException {
+    Statement stmt = null;
+    try {
+        // 拿到全局配置信息
+        Configuration configuration = ms.getConfiguration();
+        // 创建StatementHandler对象
+        StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler,
+                                                                     boundSql);
+        stmt = prepareStatement(handler, ms.getStatementLog());
+        return handler.query(stmt, resultHandler);
+    } finally {
+        closeStatement(stmt);
+    }
+}
+```
+
+关于创建statementHandler对象newStatementHandler方法源码如下所示，其本质是调用了new RoutingStatementHandler构造函数进行创建，并调用interceptorChain方法将拦截器包装statementHandler对象
+
+```java
+public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement,
+                                            Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject,
+                                                                    rowBounds, resultHandler, boundSql);
+    return (StatementHandler) interceptorChain.pluginAll(statementHandler);
+}
+```
+
+RoutingStatementHandler构造函数方法如下所示，其会根据增删改查标签信息中的statementType进行创建不同的对象。
+
+statementType在select等标签上可以进行设置
+
+> STATEMENT：非预编译
+>
+> PREPARED: 原生PREPARED
+>
+> CALLABLE: 原生CALLABLE
+
+![image-20250101171010707](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101171010707.png)
+
+```java
+public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds,
+                               ResultHandler resultHandler, BoundSql boundSql) {
+
+    switch (ms.getStatementType()) {
+        case STATEMENT:
+            delegate = new SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+            break;
+        case PREPARED:
+            delegate = new PreparedStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+            break;
+        case CALLABLE:
+            delegate = new CallableStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+            break;
+        default:
+            throw new ExecutorException("Unknown statement type: " + ms.getStatementType());
+    }
+
+}
+```
+
+在创建PreparedStatementHandler对象，调用其构造函数的时候
+
+```java
+public PreparedStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter,
+                                RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    super(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
+}
+```
+
+会将其他的处理器也设置进来
+
+![image-20250101172024909](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172024909.png)
+
+
+
+然后调用`stmt = prepareStatement(handler, ms.getStatementLog());`方法对Statement对象（PrepareStatement）进行预处理
+
+```java
+private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
+    Statement stmt;
+    Connection connection = getConnection(statementLog);
+    stmt = handler.prepare(connection, transaction.getTimeout());
+    handler.parameterize(stmt);
+    return stmt;
+}
+```
+
+其中通过parameterize方法对参数进行预编译，调用parameterHandler设置参数
+
+```java
+@Override
+public void parameterize(Statement statement) throws SQLException {
+    parameterHandler.setParameters((PreparedStatement) statement);
+}
+```
+
+调用TypeHandler获取对应的jdbc参数类型，并为PreparedStatement设置参数（预编译参数）
+
+![image-20250101172314243](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172314243.png)
+
+
+
+最后调用StatementHandler对象的query方法
+
+![image-20250101172432873](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172432873.png)
+
+通过resultSetHandler对结果值进行处理
+
+![image-20250101172539822](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172539822.png)
+
+
+
+
+
+**整个流程图：**
