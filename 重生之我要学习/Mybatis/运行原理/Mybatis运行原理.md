@@ -225,6 +225,8 @@ Mybaits结构如下所示
 
 ![image-20241225214936045](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20241225214936045.png)
 
+Mybatis的执行过程和原JDBC的数据处理一样：从参数映射到SQL解析、SQL执行到最后的结果处理和映射
+
 Mybatis的运行原理大致如下所示
 
 ![image-20241225214810516](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20241225214810516.png)
@@ -1438,15 +1440,15 @@ public void parameterize(Statement statement) throws SQLException {
 
 
 
-最后调用StatementHandler对象的query方法
+最后SimpleExecutor执行器调用StatementHandler对象的query方法
 
 ![image-20250101172432873](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172432873.png)
+
+调用PreparedStatement的execute方法
 
 通过resultSetHandler对结果值进行处理
 
 ![image-20250101172539822](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172539822.png)
-
-
 
 
 
