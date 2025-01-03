@@ -1116,7 +1116,7 @@ public Object getNamedParams(Object[] args) {
 
 然后调用sqlSession对象（defualtSqlSession）的selectOne方法（不同的返回类型调用不同的方法，如有多个返回参数，调用的时sqlSession的selectList方法），并将command.getName()即方法名称和上面包装的参数传入。
 
-调用的DefualtSqlSession方法的selectList如下所示，虽然是调用单个，但本质上还是调用的selectList方法，只不过只返回其中的第一个。如果有多个直接抛出异常
+调用的DefualtSqlSession方法的selectList如下所示，本质上还是调用的selectList方法，只不过只取返回数据其中的第一个。如果有多个直接抛出异常
 
 ```java
 @Override
@@ -1150,7 +1150,7 @@ private <E> List<E> selectList(String statement, Object parameter, RowBounds row
         // 获取到对应接口方法对应的封装了的xml中配置的增删改查标签详细信息
         MappedStatement ms = configuration.getMappedStatement(statement);
         dirty |= ms.isDirtySelect();
-        // 调用executor的query方法
+        // 调用DefaultSqlSession中维护的executor的query方法
         return executor.query(ms, wrapCollection(parameter), rowBounds, handler);
     } catch (Exception e) {
         throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -1223,7 +1223,7 @@ public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds r
 CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
 ```
 
-再调用query的重载方法
+再调用CachingExecutor中query的重载方法
 
 ```
 query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
@@ -1365,7 +1365,7 @@ public StatementHandler newStatementHandler(Executor executor, MappedStatement m
 }
 ```
 
-RoutingStatementHandler构造函数方法如下所示，其会根据增删改查标签信息中的statementType进行创建不同的对象。
+RoutingStatementHandler构造函数方法如下所示，其会根据增删改查标签信息中的statementType进行创建不同的Statement（JDBC原生对象）处理对象。
 
 statementType在select等标签上可以进行设置
 
@@ -1407,23 +1407,57 @@ public PreparedStatementHandler(Executor executor, MappedStatement mappedStateme
 }
 ```
 
-会将其他的处理器也设置进来
+会将其他的处理器,如parameterHandler和resultSetHandler也设置进来
 
 ![image-20250101172024909](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172024909.png)
 
 
 
-然后调用`stmt = prepareStatement(handler, ms.getStatementLog());`方法对Statement对象（PrepareStatement）进行预处理
+然后调用`stmt = prepareStatement(handler, ms.getStatementLog());`方法生成Statement对象（PrepareStatement）并进行预处理
 
 ```java
 private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
+    // 获取连接
     Connection connection = getConnection(statementLog);
     stmt = handler.prepare(connection, transaction.getTimeout());
     handler.parameterize(stmt);
     return stmt;
 }
 ```
+
+调用handler（RoutingStatementHandler）的prepare方法，本质上调用的是PreparedStatementHandler实现类的prepare方法，因为该对象没有对prepare方法进行重写，调用的是其父类BaseStatementHandler的prepare方法
+
+```java
+@Override
+public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
+	return delegate.prepare(connection, transactionTimeout);
+}
+```
+
+prepare方法主要 用于创建一个原生JDBC的Statement
+
+```java
+@Override
+public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
+    ErrorContext.instance().sql(boundSql.getSql());
+    Statement statement = null;
+    try {
+        statement = instantiateStatement(connection);
+        setStatementTimeout(statement, transactionTimeout);
+        setFetchSize(statement);
+        return statement;
+    } catch (SQLException e) {
+        closeStatement(statement);
+        throw e;
+    } catch (Exception e) {
+        closeStatement(statement);
+        throw new ExecutorException("Error preparing statement.  Cause: " + e, e);
+    }
+}
+```
+
+
 
 其中通过parameterize方法对参数进行预编译，调用parameterHandler设置参数
 
@@ -1444,7 +1478,7 @@ public void parameterize(Statement statement) throws SQLException {
 
 ![image-20250101172432873](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250101172432873.png)
 
-调用PreparedStatement的execute方法
+调用PreparedStatement的execute方法（JDBC的原生方法）
 
 通过resultSetHandler对结果值进行处理
 
@@ -1466,7 +1500,7 @@ public void parameterize(Statement statement) throws SQLException {
 
 ![image-20250102003014047](Mybatis%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86.assets/image-20250102003014047.png)
 
-本质上，底层调用的都是JDBC的相关方法。
+本质上，底层调用的都是原生JDBC的相关方法，通过Statement或PreparedStatement取执行SQL语句。
 
 
 
@@ -1489,3 +1523,227 @@ public void parameterize(Statement statement) throws SQLException {
     *   ResultSetHandler封装结果
 
 注意：四大对象每个创建的时候都有一个interceptorChain.pluginAll(parameterHandler);
+
+
+
+## 四、扩展
+
+### 4.1 JDBC实现数据库的增删改查
+
+因为Mybatis底层就是通过调用原生JDBC实现的，因此对于JDBC是如何进行操作数据库需要有一定的了解和掌握。
+
+#### 1、关于Java原生的JDBC和SpringJDBC区分
+
+`java.sql` 包下的内容是 Java 原生的 JDBC（Java Database Connectivity），而 Spring 的 JDBC 并不是与 `java.sql` 中的 JDBC 完全相同的东西。
+
+**1、java.sql下的JDBC（原生JDBC）**
+
+`java.sql` 包是 JDBC API 的一部分，它是 Java 提供的用于数据库操作的标准库。`java.sql` 提供了连接数据库、执行 SQL 语句、处理查询结果等基本功能。原生的 JDBC API 使用起来比较繁琐，通常需要你自己处理数据库连接、事务、异常等细节。
+
+常见的类和接口:
+
+- **Connection**：用于与数据库的连接。
+- **Statement**：用于执行 SQL 查询和更新。
+- **PreparedStatement**：用于执行带有参数的 SQL 查询和更新。
+- **ResultSet**：用于存储 SQL 查询返回的结果。
+- **SQLException**：数据库操作的异常类。
+
+使用原生 JDBC 时，通常需要进行如下步骤：
+
+1. 加载 JDBC 驱动。
+2. 创建 `Connection` 对象。
+3. 创建 `Statement` 或 `PreparedStatement` 对象。
+4. 执行 SQL 查询或更新。
+5. 处理结果集（`ResultSet`）。
+6. 关闭连接和其他资源。
+
+**2、Spring JDBC**
+
+Spring JDBC 是 Spring Framework 提供的一个更高级的 API，它对原生 JDBC 进行了封装，简化了常见的数据库操作。Spring JDBC 通过 `JdbcTemplate` 类帮助开发者避免直接操作 `Connection`、`Statement`、`ResultSet` 等原生 JDBC 类，减少了样板代码。
+
+使用示例：
+
+```java
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.sql.DataSource;
+
+public class SpringJdbcExample {
+
+    public static void main(String[] args) {
+        // 创建数据源
+        DataSource dataSource = new DriverManagerDataSource(
+                "jdbc:mysql://localhost:3306/your_database", "your_username", "your_password");
+
+        // 创建 JdbcTemplate
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        // 执行查询
+        String sql = "SELECT username, email FROM users WHERE username = ?";
+        String username = "newuser";
+        jdbcTemplate.queryForObject(sql, new Object[]{username}, (rs, rowNum) -> {
+            String userName = rs.getString("username");
+            String email = rs.getString("email");
+            System.out.println("Username: " + userName + ", Email: " + email);
+            return null;
+        });
+    }
+}
+
+```
+
+**3、对比总结**
+
+| 特性           | **原生 JDBC**                                                | **Spring JDBC**                                |
+| -------------- | ------------------------------------------------------------ | ---------------------------------------------- |
+| **简洁性**     | 需要大量样板代码，例如连接管理、资源关闭等。                 | 提供简化的 `JdbcTemplate` 类，减少样板代码。   |
+| **资源管理**   | 需要显式管理 `Connection`、`Statement`、`ResultSet` 等资源。 | 自动处理资源关闭，减少泄漏的风险。             |
+| **异常处理**   | 需要自己捕获并处理 `SQLException`。                          | 自动将 `SQLException` 转换为 Spring 异常层次。 |
+| **事务管理**   | 需要手动管理事务。                                           | Spring 提供事务管理器，简化事务操作。          |
+| **代码复杂性** | 需要更多代码，特别是错误处理和资源管理部分。                 | 通过 `JdbcTemplate` 简化数据库操作代码。       |
+
+
+
+#### 2、通过原生JDBC实现增删改操作示例
+
+相关依赖示例：
+
+使用 MySQL 数据库，你需要引入 MySQL 的 JDBC 驱动
+
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.29</version>  <!-- 请根据需要选择版本 -->
+</dependency>
+```
+
+JDBC（Java Database Connectivity）是Java中用于连接数据库并执行SQL语句的API。它提供了标准的接口来执行SQL操作，如增（Insert）、删（Delete）、改（Update）、查（Select）等。以下是如何使用JDBC实现数据库的增删改查操作的示例代码。
+
+①加载数据库驱动与建立连接
+
+```java
+import java.sql.*;
+
+public class JdbcExample {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String username = "your_username";
+        String password = "your_password";
+        
+        try {
+            // 1. 加载数据库驱动（对于MySQL数据库）
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // 2. 建立连接
+            Connection conn = DriverManager.getConnection(url, username, password);
+
+            // 以下可以执行增删改查操作
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+②增（Insert）操作
+
+```java
+public void insertData() {
+    String sql = "INSERT INTO users (username, email) VALUES (?, ?)";
+    try (Connection conn = DriverManager.getConnection(url, username, password);
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        // 设置参数
+        stmt.setString(1, "newuser");
+        stmt.setString(2, "newuser@example.com");
+
+        // 执行插入操作
+        int rowsAffected = stmt.executeUpdate();
+        System.out.println("Rows affected: " + rowsAffected);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+```
+
+③删（Delete）操作
+
+```java
+public void deleteData() {
+    String sql = "DELETE FROM users WHERE username = ?";
+    try (Connection conn = DriverManager.getConnection(url, username, password);
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        // 设置参数
+        stmt.setString(1, "newuser");
+
+        // 执行删除操作
+        int rowsAffected = stmt.executeUpdate();
+        System.out.println("Rows affected: " + rowsAffected);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+```
+
+④改（Update）操作
+
+```java
+public void updateData() {
+    String sql = "UPDATE users SET email = ? WHERE username = ?";
+    try (Connection conn = DriverManager.getConnection(url, username, password);
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        // 设置参数
+        stmt.setString(1, "updateduser@example.com");
+        stmt.setString(2, "newuser");
+
+        // 执行更新操作
+        int rowsAffected = stmt.executeUpdate();
+        System.out.println("Rows affected: " + rowsAffected);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+```
+
+⑤查（Select）操作
+
+```java
+public void selectData() {
+    String sql = "SELECT username, email FROM users WHERE username = ?";
+    try (Connection conn = DriverManager.getConnection(url, username, password);
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        // 设置参数
+        stmt.setString(1, "newuser");
+
+        // 执行查询操作
+        ResultSet rs = stmt.executeQuery();
+
+        // 处理查询结果
+        while (rs.next()) {
+            String userName = rs.getString("username");
+            String email = rs.getString("email");
+            System.out.println("Username: " + userName + ", Email: " + email);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+```
+
+注意：
+
+- 这里使用的都是PreparedStatement，而非 `Statement` 可以防止 SQL 注入问题。
+- 确保在操作完成后关闭数据库连接、`Statement` 和 `ResultSet`，防止资源泄露。
+- `executeUpdate()` 返回影响的行数（适用于 `INSERT`、`UPDATE`、`DELETE` 等操作）。
+- `executeQuery()` 返回 `ResultSet` 对象（适用于查询操作）。
+- 增操作（Insert）: 使用 `executeUpdate()` 执行 SQL 插入语句；删操作（Delete）: 使用 `executeUpdate()` 执行 SQL 删除语句；改操作（Update）: 使用 `executeUpdate()` 执行 SQL 更新语句；查操作（Select）: 使用 `executeQuery()` 执行查询语句，并通过 `ResultSet` 获取结果。
