@@ -421,7 +421,7 @@ final class FinalClass {
 
 
 
-### 2.2 final域重排序规则（△）
+### 2.2 final域重排序规则
 
 `final`域的重排序规则主要是与Java内存模型（Java Memory Model，JMM）相关的，目的是确保在多线程环境中对`final`域的正确性和可见性。这些规则帮助解决了线程安全问题，尤其是在构造函数和对象共享时。
 
@@ -430,20 +430,337 @@ final class FinalClass {
 在Java中，`final`域具有以下重排序规则：
 
 - **构造函数中的初始化**：当一个对象被创建并且构造函数执行时，任何`final`域的初始化都保证在该对象被引用之前完成。这意味着在构造函数中赋值给`final`域的操作是不可重排序的。
+
+  > **`final` 变量的赋值操作不能被重排序**（即 `final` 变量必须在构造方法中完全初始化）。
+  >
+  > **构造函数执行完毕之前，其他线程无法看到这个对象的引用**（不会看到未初始化的 `final` 变量）。
+
 - **对象的可见性**：其他线程在看到对该对象的引用时，能够看到该对象的`final`域的正确初始化值。这意味着，即使对一个对象的引用在其构造完成之前被其他线程获取，`final`域的值也会是可见的。
+
+- 具体示例：
+
+  > 错误示例（未使用 `final`，可能导致对象未完全构造就被访问）
+  >
+  > ```
+  > class UnsafeExample {
+  >     private static UnsafeExample instance; // 没有 `final`
+  >     private int value; // 可能被重排序
+  > 
+  >     public UnsafeExample() {
+  >         value = 42; // 赋值可能被重排序
+  >     }
+  > 
+  >     public static UnsafeExample getInstance() {
+  >         if (instance == null) {
+  >             instance = new UnsafeExample(); // 可能被其他线程提前看到
+  >         }
+  >         return instance;
+  >     }
+  > 
+  >     public int getValue() {
+  >         return value;
+  >     }
+  > }
+  > 
+  > public class UnsafeTest {
+  >     public static void main(String[] args) {
+  >         Runnable task = () -> {
+  >             UnsafeExample instance = UnsafeExample.getInstance();
+  >             System.out.println(Thread.currentThread().getName() + " 获取值: " + instance.getValue());
+  >         };
+  > 
+  >         Thread t1 = new Thread(task);
+  >         Thread t2 = new Thread(task);
+  > 
+  >         t1.start();
+  >         t2.start();
+  >     }
+  > }
+  > 
+  > 可能的问题
+  > 由于指令重排序，instance = new UnsafeExample(); 可能会被拆分成以下步骤：
+  > 分配内存
+  > 先让 instance 指向这块内存
+  > 执行构造函数 UnsafeExample()
+  > 赋值 value = 42;
+  > 如果线程 A 运行到第 2 步，instance 已经指向分配的内存，但还没执行构造函数，此时如果线程 B 调用 getInstance()，就会获取到未完全构造的对象，value 可能仍是默认值 0 而不是 42，导致错误行为。
+  > ```
+  >
+  > 正确示例（使用 `final`，保证构造完成后才发布）
+  >
+  > ```
+  > class SafeExample {
+  >     private static SafeExample instance;
+  >     private final int value; // `final` 变量
+  > 
+  >     public SafeExample() {
+  >         value = 42; // `final` 变量必须在构造方法内赋值
+  >     }
+  > 
+  >     public static SafeExample getInstance() {
+  >         if (instance == null) {
+  >             instance = new SafeExample();
+  >         }
+  >         return instance;
+  >     }
+  > 
+  >     public int getValue() {
+  >         return value;
+  >     }
+  > }
+  > 
+  > public class SafeTest {
+  >     public static void main(String[] args) {
+  >         Runnable task = () -> {
+  >             SafeExample instance = SafeExample.getInstance();
+  >             System.out.println(Thread.currentThread().getName() + " 获取值: " + instance.getValue());
+  >         };
+  > 
+  >         Thread t1 = new Thread(task);
+  >         Thread t2 = new Thread(task);
+  > 
+  >         t1.start();
+  >         t2.start();
+  >     }
+  > }
+  > ```
+  >
+  > **为什么 `final` 变量不会发生重排序？**
+  >
+  > **JMM 规定 `final` 变量的特殊规则**：
+  >
+  > 1. 编译器禁止重排序 `final` 变量的初始化
+  >    - `value = 42;` 必须在 `SafeExample()` 构造方法执行完之前完成，不能被重排序到 `instance = new SafeExample();` 之后。
+  > 2. 构造完成前，对象的引用不会被发布
+  >    - 只有当 `SafeExample` **完全构造完毕**（所有 `final` 变量初始化完成）后，`instance` 才能被其他线程看到。
+  >    - 线程 B **不会获取到未初始化的 `final` 变量**。
 
 2. 解决的问题
 
 这些重排序规则主要解决以下问题：
 
-- **构造器安全性**：在多线程环境中，如果一个线程正在创建一个对象，另一个线程可能在对象完全构造完成之前就获取到了这个对象的引用。通过`final`域的重排序规则，确保了在对象构造完成之前，任何`final`域的初始化都是完整且可见的。
+- **构造器安全性**：在多线程环境中，如果一个线程正在创建一个对象，另一个线程可能在对象完全构造完成之前就获取到了这个对象的引用，如下所示：
+
+  > 这种情况通常发生在 **重排序** 或 **发布未构造完成对象** 时，特别是在 **单例模式的双重检查锁**（Double-Checked Locking）没有正确实现的情况下:
+  >
+  > ```java
+  > class Singleton {
+  >     private static Singleton instance;
+  > 
+  >     private Singleton() {
+  >         // 模拟构造过程
+  >         try {
+  >             Thread.sleep(1000); // 假设构造需要一些时间
+  >         } catch (InterruptedException e) {
+  >             e.printStackTrace();
+  >         }
+  >     }
+  > 
+  >     public static Singleton getInstance() {
+  >         if (instance == null) { // 第一次检查
+  >             synchronized (Singleton.class) {
+  >                 if (instance == null) { // 第二次检查
+  >                     instance = new Singleton();
+  >                 }
+  >             }
+  >         }
+  >         return instance;
+  >     }
+  > }
+  > ```
+  >
+  > 当线程 A 正在构造 `Singleton` 对象时，线程 B 可能会在 `instance` 还未完全构造完成时就获取到了引用，从而导致使用了**未完全构造的对象**，可能会引发**空指针异常或其他不可预测的行为**。(因为指令重排的问题)
+  >
+  > 关于指令重排的详细说明：
+  >
+  > `instance = new Singleton();` 这行代码并不是一个原子操作，它实际上分为三步：
+  >
+  > - 分配内存
+  > - 调用构造函数
+  > - 将 `instance` 指向这块内存
+  >
+  > 由于**指令重排序**，可能导致执行顺序变成(示例)：
+  >
+  > - 分配内存
+  > - **先将 `instance` 指向这块内存（此时对象还未完全构造完成！）**
+  > - 执行构造函数
+  >
+  > 下面的代码展示了多个线程竞争 `Singleton` 可能导致的问题：
+  >
+  > ```java
+  > public class SingletonTest {
+  >     public static void main(String[] args) {
+  >         Runnable task = () -> {
+  >             Singleton instance = Singleton.getInstance();
+  >             System.out.println(Thread.currentThread().getName() + " 获取实例: " + instance);
+  >         };
+  > 
+  >         Thread t1 = new Thread(task);
+  >         Thread t2 = new Thread(task);
+  >         
+  >         t1.start();
+  >         t2.start();
+  >     }
+  > }
+  > 
+  > ```
+  >
+  > 如果此时t1方位的时候先只是分配了内存并先将 `instance` 指向这块内存，此时还是null值，当t2进行访问的时候，还会创建instance的实例对象。
+  >
+  > 这个问题在 **Java 1.5 之前** 的 `JMM`（Java 内存模型）下尤为常见，因此在 `Java 1.5+` 版本中，`volatile` 关键字提供了更强的可见性和禁止重排序的能力。使用 `volatile` 关键字，禁止指令重排序：
+  >
+  > ```java
+  > class Singleton {
+  >     private static volatile Singleton instance; // 添加 volatile
+  > 
+  >     private Singleton() {
+  >         try {
+  >             Thread.sleep(1000); // 模拟构造过程
+  >         } catch (InterruptedException e) {
+  >             e.printStackTrace();
+  >         }
+  >     }
+  > 
+  >     public static Singleton getInstance() {
+  >         if (instance == null) { 
+  >             synchronized (Singleton.class) {
+  >                 if (instance == null) { 
+  >                     instance = new Singleton();
+  >                 }
+  >             }
+  >         }
+  >         return instance;
+  >     }
+  > }
+  > 
+  > ```
+
+  通过`final`域的重排序规则，确保了在对象构造完成之前，任何`final`域的初始化都是完整且可见的。
+
+  > 在 Java 内存模型（JMM）中，**`final` 变量的初始化规则** 确保：
+  >
+  > 在构造函数中对 `final` 变量的赋值操作不会被重排序，即：
+  >
+  > - **`final` 变量必须在构造函数执行期间完全初始化**。
+  >
+  > 一旦构造函数完成，其他线程看到该对象时，一定能看到 `final` 变量的正确值，即：
+  >
+  > - **`final` 变量的赋值在构造函数完成前不会被另一个线程看到**。
+  >
+  > 如果 `Singleton` 的成员变量是 `final`，那么即使 `instance` 在构造过程中被另一个线程读取，该线程也至少能看到 `final` 变量被正确初始化。
+  >
+  > ```
+  > class Singleton {
+  >     private static Singleton instance;
+  > 
+  >     private final int value; // 使用 final 变量
+  > 
+  >     private Singleton() {
+  >         this.value = 42; // `final` 变量必须在构造方法中赋值
+  >         try {
+  >             Thread.sleep(1000); // 模拟构造过程
+  >         } catch (InterruptedException e) {
+  >             e.printStackTrace();
+  >         }
+  >     }
+  > 
+  >     public static Singleton getInstance() {
+  >         if (instance == null) { 
+  >             synchronized (Singleton.class) {
+  >                 if (instance == null) { 
+  >                     instance = new Singleton();
+  >                 }
+  >             }
+  >         }
+  >         return instance;
+  >     }
+  > 
+  >     public int getValue() {
+  >         return value;
+  >     }
+  > }
+  > 
+  > ```
+  >
+  > 为什么 `final` 可以防止未初始化对象被读取？
+  >
+  > - **线程 A 先执行 `new Singleton()`**
+  >
+  >   - `value` 作为 `final` 变量，必须在构造方法内初始化，并且不会被重排序。
+  >
+  >   - **即使指令重排序** 使 `instance` 先指向分配的内存，其他线程读取时至少能保证 `value` 被正确初始化。
+  >
+  > - **线程 B 获取 `instance`**,由于 value是 final，JMM 保证了**线程 B 一定能看到 `value = 42`，不会看到未初始化的值**。
+  >
+  > 虽然 `final` 变量能保证它本身不会被重排序，但它 **不能** 解决整个对象发布过早的问题。例如，如果 `Singleton` 里还有**非 `final` 变量**，那么这些变量仍然可能被线程 B 看到 **未初始化** 的状态：
+  >
+  > ```
+  > class Singleton {
+  >     private static Singleton instance;
+  > 
+  >     private final int value = 42; // `final` 变量保证初始化
+  >     private int otherValue; // 这个变量可能未被正确初始化
+  > 
+  >     private Singleton() {
+  >         otherValue = 100; // 这个赋值可能被重排序
+  >     }
+  > 
+  >     public static Singleton getInstance() {
+  >         if (instance == null) { 
+  >             synchronized (Singleton.class) {
+  >                 if (instance == null) { 
+  >                     instance = new Singleton();
+  >                 }
+  >             }
+  >         }
+  >         return instance;
+  >     }
+  > 
+  >     public int getOtherValue() {
+  >         return otherValue;
+  >     }
+  > }
+  > 
+  > ```
+  >
+  > 如果发生指令重排序：
+  >
+  > 1. `instance` 可能在 `otherValue = 100;` 之前被发布给另一个线程。
+  > 2. 线程 B 可能获取到 `instance`，但 `otherValue` 可能仍是默认值 `0`，而不是 `100`
+  >
+  > 解决方法：
+  >
+  > 1.**使用 `volatile`**
+  > `volatile` 关键字不仅能**防止指令重排序**，还能**确保可见性**，保证所有变量都被正确初始化。
+  >
+  > ```java
+  > private static volatile Singleton instance;
+  > ```
+  >
+  > 2.**使用静态内部类（推荐）** 由于 **JVM 规定** 类的静态变量初始化是在**类加载时完成的**，它**天然保证了线程安全**
+  >
+  > ```java
+  > class Singleton {
+  >     private Singleton() {}
+  > 
+  >     private static class Holder {
+  >         private static final Singleton INSTANCE = new Singleton();
+  >     }
+  > 
+  >     public static Singleton getInstance() {
+  >         return Holder.INSTANCE;
+  >     }
+  > }
+  > ```
+
 - **数据竞争**：`final`域的使用可以减少数据竞争的风险，因为它们在初始化后不可更改，并且由于重排序规则，保证了在构造完成前不会被访问到不完全初始化的状态。
+
 - **简化代码**：使用`final`关键字可以使代码在多线程环境中更简单，因为它减少了需要考虑的状态变化和同步机制。
 
 示例
 
 ```
-java复制代码public class Example {
+public class Example {
     private final int x;
 
     public Example(int value) {
@@ -461,6 +778,10 @@ java复制代码public class Example {
 总结：
 
 通过这些重排序规则，Java确保了`final`域在多线程环境中的安全性和可见性，有效避免了数据竞争和未初始化状态的问题。
+
+![image-20250205014647463](final%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E7%90%86%E8%A7%A3.assets/image-20250205014647463.png)
+
+
 
 
 
