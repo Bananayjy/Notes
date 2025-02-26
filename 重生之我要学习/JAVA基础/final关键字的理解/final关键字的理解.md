@@ -866,7 +866,96 @@ final class forTest.Outter$1 extends java.lang.Thread {
 
 **内部类的访问机制**： 内部类可以访问外部类的成员，包括字段和方法，但对于局部变量的访问有一些特别的规则。Java 中的内部类不能直接访问外部类方法中的非 `final` 局部变量。在 Java 8 及以后的版本中，虽然局部变量可以是“有效的 final”但仍然需要遵循这个规则。
 
-示例：
+> 关于有效的final和声明的final说明
+>
+> Java中，`final`关键字有两种常见用法：一种是在声明时标记变量不可变，另一种则是在方法中表示变量不能被重新赋值。我们可以将它分为两个概念：**有效final** 和 **声明final**
+>
+> - 声明final
+>
+> 当你声明一个变量时，如果用`final`关键字修饰它，这意味着变量的值一旦赋值后，就不能再改变了。对于基本数据类型，这意味着你不能修改变量的值；对于引用类型，这意味着你不能改变引用的对象，但可以改变对象的内容。
+>
+> 基础类型示例：
+>
+> ```
+> final int a = 10;
+> a = 20;  // 编译错误，因为a是final变量，不能重新赋值
+> ```
+>
+> 引用类型示例：
+>
+> ```
+> final List<String> list = new ArrayList<>();
+> list = new ArrayList<>();  // 编译错误，因为list是final引用，不能重新指向其他对象
+> 
+> list.add("Hello");  // 可以，因为是修改引用对象的内容
+> ```
+>
+> - 有效final
+>
+> 有效`final`是指，在代码中一个变量没有被显式声明为`final`，但它的值在整个生命周期中也没有被修改过。在Java 8及之后的版本中，**有效`final`** 变量可以用于局部内部类和Lambda表达式中。
+>
+> 换句话说，**有效`final`** 变量的值在其生命周期内没有发生改变，尽管它没有加上`final`关键字。因此，JVM会将它视为一个`final`变量。
+>
+> 示例：
+>
+> ```
+> int a = 10;
+> Runnable r = new Runnable() {
+>     @Override
+>     public void run() {
+>         System.out.println(a);  // 这里可以使用a，因为a在整个方法中没有被改变
+>     }
+> };
+> a = 20;  // 如果a在这之后修改了，就不再是有效final了
+> ```
+>
+> 如果你修改了`a`，则它不再是有效`final`，因为它的值发生了变化，导致你不能将它传递给内部类或者Lambda表达式
+>
+> 如果如下方式使用，首先会报需要将a声明为final，因为其值改变了，不在符合有效final
+>
+> ```java
+> public static void main(String[] args) throws InterruptedException {
+>     int a = 123;
+> 
+>     new Thread(){
+>         public void run(){
+>             a = a + 3;
+>         }
+>     }.start();
+> }
+> ```
+>
+> ![image-20250226104629058](final%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E7%90%86%E8%A7%A3.assets/image-20250226104629058.png)
+>
+> 然后把final加上后，此时就会报基础类型在final修饰下，不能改变其值
+>
+> ```
+> public static void main(String[] args) throws InterruptedException {
+>     final int a = 123;
+> 
+>     new Thread(){
+>         public void run(){
+>             a = a + 3;
+>         }
+>     }.start();
+> }
+> ```
+>
+> ![image-20250226104704433](final%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E7%90%86%E8%A7%A3.assets/image-20250226104704433.png)
+>
+> 区别总结：
+>
+> - **声明`final`**：显式声明变量为`final`，确保其值在初始化后不能再改变。
+>
+> - **有效`final`**：没有显式声明`final`，但是变量在整个方法或代码块中值不被修改，JVM仍然把它当作`final`来处理，允许它在内部类、Lambda表达式等上下文中使用。
+>
+> 为什么要有有效final：
+>
+> 在Java 8及之后的版本中，`final`和**有效`final`**变量都可以被传递到Lambda表达式中或被内部类捕获。这是为了确保变量的值在这些上下文中保持一致，避免可能的线程安全问题
+
+
+
+具体几种示例：
 
 ```java
 public class A {
@@ -899,7 +988,7 @@ class B {
 }
 ```
 
-结果：
+结果如下，因为其是引用类型，虽然加了final，但是只要不改变其引用地址即可，可以改变引用对象中的内容
 
 ```
 Thread value:B(name=123)
@@ -927,7 +1016,7 @@ public class A {
 
 ![image-20241026222614237](final%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E7%90%86%E8%A7%A3.assets/image-20241026222614237.png)
 
-
+在`a + 123`时，首先会把`a`的值解包成一个基本类型`int`，然后进行加法运算，接着会创建一个新的`Integer`对象并将新的结果值其赋值给a，此时引用地址改变了，不符合final不改变的要求。
 
 
 
