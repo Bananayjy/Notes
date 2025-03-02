@@ -1,0 +1,3 @@
+https://blog.csdn.net/Bb15070047748/article/details/107266400
+https://blog.csdn.net/cyzero/article/details/8620909
+SQL 的 编译过程包括：（语法解析、语义解析和优化）
