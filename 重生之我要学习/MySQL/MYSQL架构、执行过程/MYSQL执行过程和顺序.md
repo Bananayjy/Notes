@@ -587,6 +587,37 @@ SQL并不是按照我们的书写顺序来从前往后、左往右依次执行�
 - order by
 - limit
 
+具体示例：
+
+```
+SELECT 
+    department, 
+    COUNT(*) AS employee_count
+FROM 
+    employees
+JOIN 
+    departments ON employees.dept_id = departments.id
+WHERE 
+    employees.salary > 5000
+GROUP BY 
+    department
+HAVING 
+    COUNT(*) > 10
+ORDER BY 
+    employee_count DESC
+LIMIT 5;
+```
+
+- FROM:确定查询的数据源,从`employees`表和`departments`表获取数据
+- on:处理连接条件，根据`employees.dept_id = departments.id`条件连接`employees`和`departments`表
+- join：合并表，将`employees`和`departments`表按照连接条件合并，放到中间结果集中
+- where：过滤数据，过滤出`employees.salary > 5000`的记录
+- group by：对数据进行分组，按照`department`列对数据进行分组
+- having：过滤分组后的数据，过滤出`COUNT(*) > 10`的分组。
+- select：选择要返回的列，选择`department`列和`COUNT(*)`聚合结果（别名为`employee_count`）
+- group by：对结果排序，按照`employee_count`列降序排序
+- limit：限制返回的行数，只返回前5行数据
+
 在MySQL中，查询语句中子查询的执行顺序可以根据具体情况而有所不同，但一般来说，以下是一个常见的执行顺序：
 
 - 内部子查询：MySQL通常会首先执行子查询，生成临时结果集，然后将其用于外部查询。内部子查询是指嵌套在主查询中的子查询，通常作为主查询的一部分。
