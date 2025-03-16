@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--配置目标类-->
+    <bean id="userService" class="com.example.service.Impl.UserServiceImpl"></bean>
+    <!--配置增强类-->
+    <bean id="Myadvice3" class="com.example.advice.Myadvice3"></bean>
+
+    <!--aop配置-->
+    <aop:config>
+        <!--配置切点表达式-->
+        <aop:pointcut id="myPointcut" expression="execution(void com.example.service.Impl.UserServiceImpl.show1())"/>
+        <!--使用<aspect>配置切面-->
+        <aop:advisor advice-ref="Myadvice3" pointcut-ref="myPointcut"/>
+    </aop:config>
+
+</beans>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="375d586e-c3b0-44ff-a492-772b266c3b14" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="D:\软件\develop\apache-maven-3.6.1\mvn_repo" />
+        <option name="mavenHome" value="D:/软件/develop/apache-maven-3.6.1" />
+        <option name="userSettingsFile" value="D:\软件\develop\apache-maven-3.6.1\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="jdkForImporter" value="1.8" />
+        <option name="vmOptionsForImporter" value="-Xmx768m" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="1.8" />
+  </component>
+  <component name="ProjectId" id="2TnLYymItpc1sRFAd4iwNV5plJ5" />
+  <component name="ProjectViewState">
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/spring_trans_test" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\项目\spring_aop_test01\src\main\resources" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.ApplicationContextTest">
+    <configuration name="ApplicationContextTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.ApplicationContextTest" />
+      <module name="spring_aop_test01" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CglibTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.test.CglibTest" />
+      <module name="spring_aop_test01" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ApplicationContextTest" />
+        <item itemvalue="Application.CglibTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="375d586e-c3b0-44ff-a492-772b266c3b14" name="Default Changelist" comment="" />
+      <created>1691673949819</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1691673949819</updated>
+      <workItem from="1691673954926" duration="5987000" />
+      <workItem from="1692016002583" duration="268000" />
+      <workItem from="1692407532893" duration="1402000" />
+      <workItem from="1692409510407" duration="16361000" />
+      <workItem from="1692622578478" duration="1208000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="462" y="127" key="#Project_Structure" timestamp="1691681234471">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="462" y="127" key="#Project_Structure/0.0.1739.930@0.0.1739.930" timestamp="1691681234471" />
+    <state x="197" y="350" key="#com.intellij.ide.util.MemberChooser" timestamp="1692413062741">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="197" y="350" key="#com.intellij.ide.util.MemberChooser/0.0.1739.930@0.0.1739.930" timestamp="1692413062741" />
+    <state x="547" y="395" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1692431821196">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="547" y="395" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1739.930@0.0.1739.930" timestamp="1692431821196" />
+    <state x="660" y="335" width="418" height="265" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1692428176279">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="660" y="335" width="418" height="265" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1739.930@0.0.1739.930" timestamp="1692428176279" />
+    <state x="689" y="344" key="FileChooserDialogImpl" timestamp="1692626238379">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="689" y="344" key="FileChooserDialogImpl/0.0.1739.930@0.0.1739.930" timestamp="1692626238379" />
+    <state width="1696" height="264" key="GridCell.Tab.0.bottom" timestamp="1692431854491">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state width="1696" height="264" key="GridCell.Tab.0.bottom/0.0.1739.930@0.0.1739.930" timestamp="1692431854491" />
+    <state width="1696" height="264" key="GridCell.Tab.0.center" timestamp="1692431854491">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state width="1696" height="264" key="GridCell.Tab.0.center/0.0.1739.930@0.0.1739.930" timestamp="1692431854491" />
+    <state width="1696" height="264" key="GridCell.Tab.0.left" timestamp="1692431854491">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state width="1696" height="264" key="GridCell.Tab.0.left/0.0.1739.930@0.0.1739.930" timestamp="1692431854491" />
+    <state width="1696" height="264" key="GridCell.Tab.0.right" timestamp="1692431854491">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state width="1696" height="264" key="GridCell.Tab.0.right/0.0.1739.930@0.0.1739.930" timestamp="1692431854491" />
+    <state x="592" y="213" key="SettingsEditor" timestamp="1691674018787">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="592" y="213" key="SettingsEditor/0.0.1739.930@0.0.1739.930" timestamp="1691674018787" />
+    <state x="273" y="0" width="1271" height="668" key="dock-window-1" timestamp="1692413413847">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="273" y="0" width="1271" height="668" key="dock-window-1/0.0.1739.930@0.0.1739.930" timestamp="1692413413847" />
+    <state x="527" y="214" key="run.anything.popup" timestamp="1692410348725">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="527" y="214" key="run.anything.popup/0.0.1739.930@0.0.1739.930" timestamp="1692410348725" />
+    <state x="532" y="198" width="672" height="678" key="search.everywhere.popup" timestamp="1692411391840">
+      <screen x="0" y="0" width="1739" height="930" />
+    </state>
+    <state x="532" y="198" width="672" height="678" key="search.everywhere.popup/0.0.1739.930@0.0.1739.930" timestamp="1692411391840" />
+  </component>
+</project>
