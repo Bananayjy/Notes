@@ -603,7 +603,7 @@ https://blog.csdn.net/qq_38671485/article/details/145118810
 
 **表：**account
 
-**索引：**update_time
+**索引：**update_time（idx_update_time）
 
 **查询语句：**
 
