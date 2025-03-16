@@ -601,7 +601,17 @@ https://blog.csdn.net/qq_38671485/article/details/145118810
 
 关于根据索引进行数据查询过滤、筛选的全过程示例。
 
+**表：**account
 
+**索引：**update_time
+
+**查询语句：**
+
+```
+select id,name,balance from account where update_time> '2020-09-19' limit 100000,10;
+```
+
+**具体执行过程：**
 
 
 
