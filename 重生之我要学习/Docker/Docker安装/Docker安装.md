@@ -119,6 +119,40 @@ Docker version 20.10.9, build c2ea9bc
    }
    ```
 
+   ```
+   sudo tee /etc/docker/daemon.json <<-'EOF'
+   {
+       "registry-mirrors": ["https://docker.m.daocloud.io"],
+       "data-root":"/home/.docker"
+   }
+   EOF
+   
+   
+   
+   // 推荐配置
+   {
+     "registry-mirrors": [
+       "registry-mirrors": ["https://docker.m.daocloud.io"],
+       "data-root":"/home/.docker"
+     ]
+   }
+   
+   // 公司测试环境配置
+   {
+     "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn","https://aj2rgad5.mirror.aliyuncs.com"],
+     "insecure-registries":["docker-registry:5050"],
+   	"proxies": {
+                           "http-proxy": "http://127.0.0.1:7890",
+                           "https-proxy": "http://127.0.0.1:7890",
+                           "no-proxy": "docker-registry,127.0.0.1,localhost"
+           },  
+   	"data-root":"/home/.docker"
+   }
+   
+   ```
+   
+   
+   
    > 阿里云镜像网站：https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
    >
    > 选择centos
@@ -155,9 +189,9 @@ Docker version 20.10.9, build c2ea9bc
    > cd /etc/docker
    > mv daemon.json daemon.conf
    > ```
-
+   
    重启 Docker 服务：
-
+   
    ```
    sudo systemctl daemon-reload
    sudo systemctl restart docker
@@ -177,3 +211,53 @@ sudo docker run hello-world
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
 ```
+
+### 二、docker-compose在线安装
+
+> 安装参考文章：https://blog.csdn.net/qyj19920704/article/details/137428490
+>
+> Docker Compose：多容器编排工具，其核心功能如下：
+>
+> - 通过YAML文件定义多容器应用
+> - 一键启动/停止整个应用栈
+> - 管理容器间的依赖关系和启动顺序
+> - 简化复杂应用的部署流程
+>
+> docker compse 和 docker区别：
+>
+> | 特性         | Docker                     | Docker Compose                 |
+> | :----------- | :------------------------- | :----------------------------- |
+> | **管理对象** | 单个容器                   | 多容器应用栈                   |
+> | **配置方式** | 命令行参数                 | YAML格式文件                   |
+> | **网络管理** | 需要手动创建网络并连接容器 | 自动创建专属网络连接所有服务   |
+> | **适用场景** | 简单容器操作和测试         | 复杂多服务应用的开发和生产部署 |
+> | **启动命令** | `docker run`               | `docker-compose up`            |
+> | **典型用途** | 基础容器操作、镜像构建     | 微服务架构、完整应用环境部署   |
+
+
+
+可以通过如下命令查看docker和docker-compose是否安装
+
+- docker -v
+- docker-compose -v
+
+从 Docker 官方的 GitHub 仓库下载 Docker Compose 的二进制文件。您可以使用`curl`命令来下载。在终端中运行以下命令：
+
+```
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+```
+
+下载完成后，您需要为`docker-compose`添加执行权限，运行如下命令
+
+```
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+验证：
+
+```
+[root@banana mysql]# docker-compose --version
+Docker Compose version v2.34.0
+```
+
