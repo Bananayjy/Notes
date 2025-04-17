@@ -6,7 +6,7 @@ mybaits的工作原理如下所示
 
 ![image-20250104160828453](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104160828453.png)
 
-首先根据各种配置文件（全局配置文件、mysql映射文件）得到SqlSessionFactory，SqlSessionFactory又创建出SqlSession对象，SqlSession对象通过Executor去进行增删改查，每一个增删改查标签的详细信息被映射成为一个MappedStatement。Executor通过StatementHandlert去进行增删改查，本质上是通过JDBC的statement去进行的增删改查，增删改查要设置参数通过parameterHandler（借助TypeHandler）去实现，增删改查完成后通过ResultHandler（借助TypeHandler）封装结果。
+首先根据各种配置文件（全局配置文件、mysql映射文件）得到SqlSessionFactory，SqlSessionFactory又创建出SqlSession对象，SqlSession对象通过Executor去进行增删改查（增删改查实际上是通过StatementHandler去做的，Executor主要做的是缓存管理、事务管理、SQL执行流程控制（完成参数绑定、SQL 执行、结果映射，处理延迟加载（Lazy Loading）逻辑）、批处理支持等），每一个增删改查标签的详细信息被映射成为一个MappedStatement。Executor通过StatementHandlert去进行增删改查，本质上是通过JDBC的statement去进行的增删改查，增删改查要设置参数通过parameterHandler（借助TypeHandler）去实现，增删改查完成后通过ResultHandler（借助TypeHandler）封装结果。
 
 ## 二、关于插件开发
 
@@ -37,7 +37,7 @@ public Object pluginAll(Object target) {
 
 因此，我们可以利用插件为目标对象（四大对象）创建一个代理对象，在调用目标对象的时候，代理对象就可以拦截到四大对象的每一个执行，就会调用代理对象增强的方法（即AOP，面向切面）
 
-### 三、插件实现&原理
+## 三、插件实现&原理
 
 ### 3.1 实现demo
 
@@ -169,16 +169,65 @@ public void test01() throws IOException {
 
 ### 3.2 原理
 
-通过插件签名@Intercepts（该注解可以包含一个或多个 `@Signature` 注解，`@Signature` 描述了具体要拦截的目标类、方法以及方法参数）可以知道，定义的拦截器的目标是mybatis四大类中的`StatementHandler` 类（MyBatis 中负责执行 SQL 语句的核心类，负责将 SQL 语句和参数绑定到 `Statement` 对象上）要拦截的目标方法是 `StatementHandler` 类中的 `parameterize`（用于将参数传递给 SQL 语句）指定方法的参数类型为 `Statement`。
+> Mybatis 自身的功能虽然强大，但是并不能完美切合所有的应用场景，因此 MyBatis 提供了插件接口，我们可以通过添加用户自定义插件的方式对 MyBatis 进行扩展。用户自定义插件也可以改变 Mybatis 的默认行为，例如，我们可以拦截 SQL 语句并对其进行重写。
+>
+> 由于用户自定义插件会影响 MyBatis 的核心行为，在使用自定义插件之前，开发人员需要了解 MyBatis 内部的原理，这样才能编写出安全、高效的插件。
+
+首先在创建SqlSessionFactory的时候，会调用XMLConfigBuilder的pluginsElement方法，读取mybatis配置文件中配置的插件plugins，调用Configuration的addInterceptor方法，将插件添加到拦截器 Interceptor 链中
 
 ```java
-@Intercepts(
-        {
-                // type：需要拦截对象的class对象 method：需要拦截的方法  入参：方法可能有重载的情况，入参情况
-                @Signature(type= StatementHandler.class, method = "parameterize", args = Statement.class )
+// 解析 <plugins /> 标签，添加到 Configuration#interceptorChain 中
+private void pluginsElement(XNode context) throws Exception {
+    if (context != null) {
+        // 遍历子标签
+        for (XNode child : context.getChildren()) {
+            // 获取配置的插件信息
+            String interceptor = child.getStringAttribute("interceptor");
+            Properties properties = child.getChildrenAsProperties();
+            // 创建 Interceptor 对象，并设置属性
+            Interceptor interceptorInstance = (Interceptor) resolveClass(interceptor).getDeclaredConstructor()
+                .newInstance();
+            interceptorInstance.setProperties(properties);
+            // 将插件添加到 configuration 维护的 interceptorChain 对象中
+            configuration.addInterceptor(interceptorInstance);
         }
-)
+    }
+}
+
+// 将当前插件添加到控制器链中
+public void addInterceptor(Interceptor interceptor) {
+    interceptorChain.addInterceptor(interceptor);
+}
 ```
+
+声明一个自定义插件：通过插件签名@Intercepts（该注解可以包含一个或多个 `@Signature` 注解，`@Signature` 描述了具体要拦截的目标类、方法以及方法参数）可以知道，定义的拦截器的目标是mybatis四大类中的`StatementHandler` 类（MyBatis 中负责执行 SQL 语句的核心类，负责将 SQL 语句和参数绑定到 `Statement` 对象上）要拦截的目标方法是 `StatementHandler` 类中的 `prepare`方法，指定方法的参数类型为 `Connection.class, Integer.class`。
+
+```java
+// type：需要拦截对象的class对象 method：需要拦截的方法  入参：方法可能有重载的情况，入参情况
+@Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class, Integer.class }))
+public static class SwitchCatalogInterceptor implements Interceptor {
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+        Object[] args = invocation.getArgs();
+        Connection con = (Connection) args[0];
+        con.setSchema(SchemaHolder.get());
+        return invocation.proceed();
+    }
+}
+```
+
+在mybaits配置文件中进行声明
+
+```xml
+<plugins>
+    <plugin
+      interceptor="org.apache.ibatis.plugin.PluginTest$SwitchCatalogInterceptor" />
+  </plugins>
+```
+
+然后创建SqlSessionFactory的时候，就会将拦截器加入到Configuration对象中，如下图所示：
+
+![image-20250417124448665](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417124448665.png)
 
 可以看到四大对象在创建的时候都会调用interceptorChain的pluginAll方法
 
@@ -190,7 +239,7 @@ public void test01() throws IOException {
 
 ![image-20250104195802678](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104195802678.png)
 
-interceptorChain的pluginAll方法如下所示，遍历所有的interceptors（因为我们这里只声明了一个拦截器，所以interceptors的数量是1个），并执行拦截器的plugin方法，并将需要增强的对象（四大对象，这里即target）作为参数传入
+interceptorChain的pluginAll方法如下所示，遍历所有的interceptors（因为我们这里只声明了一个拦截器，所以interceptors的数量是1个，即在创建SqlSessionFactory对象的时候加入），并执行拦截器的plugin方法，并将需要增强的对象（这里的target即四大对象）作为参数传入
 
 ```java
 public Object pluginAll(Object target) {
@@ -209,50 +258,59 @@ interceptors的数量
 
 ![image-20250104200824322](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104200824322.png)
 
-Plugin的wrap方法如下所示
+Plugin的wrap方法用于获得匹配当前四大对象之一target的自定义插件，并创建目标类target的代理对象如下所示
 
 ```java
+// 创建目标类的代理对象
 public static Object wrap(Object target, Interceptor interceptor) {
+    // 获得拦截的方法映射
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
+    // 获得目标类的类型
     Class<?> type = target.getClass();
+    // 获得目标类的接口集合
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
+    // 若有接口，则创建目标对象的 JDK Proxy 对象
     if (interfaces.length > 0) {
         return Proxy.newProxyInstance(type.getClassLoader(), interfaces, new Plugin(target, interceptor, signatureMap));
     }
+    // 如果没有，则返回原始的目标对象
     return target;
 }
 ```
 
 首先调用getSignatureMap获取当前自定义拦截器签名中的信息，以需要代理的目标对象的class对象作为key，以需要增强的方法作为value，最终放到signatureMap的map对象中
 
-![image-20250104202024494](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104202024494.png)
+![image-20250417125412891](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125412891.png)
 
 通过target.getClass()方法，获取目标对象的class类对象
 
 ![image-20250104202255562](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104202255562.png)
 
-调用getAllInterfaces方法获取目标对象满足当前拦截器需要进行代理的对象的接口
-
-通过获取当前目标对象的接口，并判断signatureMap中的key是包含该接口实现爱你
+调用getAllInterfaces方法获取当前拦截器满足目标对象接口，需要进行代理的对象接口，通过获取当前目标对象的接口，并判断signatureMap中的key是包含该接口实现（即是不是对当前target进行增强）
 
 ```java
 private static Class<?>[] getAllInterfaces(Class<?> type, Map<Class<?>, Set<Method>> signatureMap) {
+    // 接口的集合
     Set<Class<?>> interfaces = new HashSet<>();
+    // 循环递归 type 类，及其父类
     while (type != null) {
+        // 遍历接口集合，若在 signatureMap 中，则添加到 interfaces 中
         for (Class<?> c : type.getInterfaces()) {
             if (signatureMap.containsKey(c)) {
                 interfaces.add(c);
             }
         }
+        // 获得父类
         type = type.getSuperclass();
     }
+    // 创建接口的数组
     return interfaces.toArray(new Class<?>[0]);
 }
 ```
 
 这里interfaces的值（数组）就是StatementHandler接口
 
-![image-20250104202542330](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104202542330.png)
+![image-20250417125538740](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125538740.png)
 
 后面就是如果目标对象满足当前拦截器需要进行代理的对象的接口，就创建其代理对象
 
@@ -264,21 +322,23 @@ if (interfaces.length > 0) {
 
 代理对象：
 
-![image-20250104234207639](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104234207639.png)
+![image-20250417125603056](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125603056.png)
 
-之后，当目标对象调用parameterize方法的时候，就会调用到代理对象的增强方法
+之后，当目标对象调用prepare方法的时候，就会调用到代理对象的增强方法
 
-![image-20250104202941179](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104202941179.png)
+![image-20250417125743407](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125743407.png)
 
 其实际调用的时Plugin对象（实现InvocationHandler接口，动态代理）中的invoke方法
 
-![image-20250104203043503](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104203043503.png)
+![image-20250417125818845](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125818845.png)
 
 invoke方法又会调用我们自定义拦截器的intercept方法（在调用invocation.proceed前后增加方法，及是对该方法的增强）
 
-![image-20250104203120469](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250104203120469.png)
+![image-20250417125837133](Mybatis%E6%8F%92%E4%BB%B6.assets/image-20250417125837133.png)
 
-## 三、关于多插件
+总的来说，MyBatis 的插件，还是基于**动态代理**来实现。
+
+## 四、关于多插件
 
 ### 3.1 说明
 
@@ -384,7 +444,7 @@ public class MyPlugin2 implements Interceptor {
 
 
 
-## 四、扩展
+## 五、扩展
 
 ### 4.1 自定义插件开发
 
@@ -501,7 +561,10 @@ public class MyPlugin implements Interceptor {
 
 ### 4.2 Mybaits的分页插件
 
-详情查看PageHelper分页插件
+关于PageHelper分页插件可以参考如下文章：
+
+- https://blog.csdn.net/shenchaohao12321/article/details/80168655
+- https://my.oschina.net/zudajun/blog/745232
 
 ### 4.3 批量执行
 

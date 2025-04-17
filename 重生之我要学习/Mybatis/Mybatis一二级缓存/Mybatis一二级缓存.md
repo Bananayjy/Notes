@@ -7,7 +7,7 @@ MyBatis 包含一个非常强大的查询缓存特性,它可以非常方便地�
 MyBatis 系统中默认定义了两级缓存：一级缓存（本地缓存）和二级缓存（全局缓存）
 
 - 默认情况下，只有一级缓存(SqlSession级别的缓存也称为本地缓存)开启
-- 二级缓存需要手动开启和配置，是基于namespace级别的缓存。
+- 二级缓存需要手动开启和配置，是基于namespace级别(mapper级别)的缓存。
 - 为了提高扩展性。MyBatis定义了缓存接口Cache。我们可以通过实现Cache接口来自定义二级缓存
 
 ### 1.1 原理图
@@ -28,6 +28,17 @@ MyBatis 系统中默认定义了两级缓存：一级缓存（本地缓存）和
 - 在mybatis3.1之后，可以通过在mybatis.xml中配置本地缓存作用域localCacheScope
 
   ![image-20250105171525632](Mybatis%E4%B8%80%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98.assets/image-20250105171525632.png)
+
+触发条件:
+
+- **相同的查询语句**：即 SQL 语句必须一致。
+- **相同的参数**：查询的参数必须完全相同。
+- **相同的 `SqlSession`**：必须在同一个 `SqlSession` 对象内。
+
+缓存存储位置:
+
+- 一级缓存的存储是基于 `SqlSession` 实例的。每个 `SqlSession` 对象都有一个独立的缓存，称为 **LocalCache**。
+- **LocalCache** 是一个 `HashMap`，它存储了当前 `SqlSession` 查询的结果。缓存中的 key 是查询的 SQL 语句和查询参数的组合，value 是查询的结果（例如，查询的对象或数据列表）
 
 ### 2.2 一级缓存示例
 
