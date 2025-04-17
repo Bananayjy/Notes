@@ -1,10 +1,10 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.12">
   <diagram name="第 1 页" id="WrR6-rWOqpbrp9a6Z7LZ">
-    <mxGraphModel dx="2726" dy="1401" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+    <mxGraphModel dx="763" dy="392" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="6a11JjnXTWsjXByUQiAF-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-1" target="6a11JjnXTWsjXByUQiAF-2">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-1" target="6a11JjnXTWsjXByUQiAF-2" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="438" y="326" />
@@ -12,10 +12,18 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-1" value="MapperProxy" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
-          <mxGeometry x="246" y="83" width="100" height="1032" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-1" target="6a11JjnXTWsjXByUQiAF-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="226" y="1150" />
+              <mxPoint x="226" y="1150" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-2" target="6a11JjnXTWsjXByUQiAF-11">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-1" value="MapperProxy" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="1" vertex="1">
+          <mxGeometry x="246" y="83" width="100" height="1083" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-2" target="6a11JjnXTWsjXByUQiAF-11" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="641" y="390" />
@@ -23,7 +31,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-2" target="6a11JjnXTWsjXByUQiAF-18">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-2" target="6a11JjnXTWsjXByUQiAF-18" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="922" y="507" />
@@ -31,10 +39,18 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-2" value="&lt;div style=&quot;background-color:#ffffff;color:#080808&quot;&gt;&lt;div&gt;&lt;span style=&quot;color:#000000;&quot;&gt;MapperMethod&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="489" y="83" width="100" height="1026" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-2" target="6a11JjnXTWsjXByUQiAF-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="415" y="1139" />
+              <mxPoint x="415" y="1139" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-3" target="6a11JjnXTWsjXByUQiAF-1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-2" value="&lt;div style=&quot;background-color:#ffffff;color:#080808&quot;&gt;&lt;div&gt;&lt;span style=&quot;color:#000000;&quot;&gt;MapperMethod&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="489" y="83" width="100" height="1081" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-3" target="6a11JjnXTWsjXByUQiAF-1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="239" y="207" />
@@ -42,13 +58,13 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-3" value="Client" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
-          <mxGeometry x="58" y="83" width="100" height="1035" as="geometry" />
+        <mxCell id="6a11JjnXTWsjXByUQiAF-3" value="Client" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="1" vertex="1">
+          <mxGeometry x="58" y="83" width="100" height="1086" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-6" value="调用mapper接口代理对象&lt;div&gt;的invoke方法&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-6" value="调用mapper接口代理对象&lt;div&gt;的invoke方法&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="122" y="162" width="155" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-1" target="6a11JjnXTWsjXByUQiAF-1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-1" target="6a11JjnXTWsjXByUQiAF-1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="340.9985714285713" y="269" as="sourcePoint" />
             <mxPoint x="340.9985714285713" y="289" as="targetPoint" />
@@ -58,13 +74,13 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-8" value="1.将代理调用的方法Method&lt;div&gt;封装成MapperMethod&lt;/div&gt;&lt;div&gt;2.根据是否是默认方法封装成&lt;/div&gt;&lt;div&gt;PlainMethodInvoker&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;或者DefaultMethodInvoker&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-8" value="1.将代理调用的方法Method&lt;div&gt;封装成MapperMethod&lt;/div&gt;&lt;div&gt;2.根据是否是默认方法封装成&lt;/div&gt;&lt;div&gt;PlainMethodInvoker&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;或者DefaultMethodInvoker&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="321" y="135" width="172" height="84" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-10" value="调用封装后&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;PlainMethodInvoker&lt;/span&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;或者DefaultMethodInvoker的invoke方法&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;这里以PlainMethodInvoker为例，即间接&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;调用MapperMethod的execute方法&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-10" value="调用封装后&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;PlainMethodInvoker&lt;/span&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;或者DefaultMethodInvoker的invoke方法&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;这里以PlainMethodInvoker为例，即间接&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;调用MapperMethod的execute方法&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="295" y="258" width="232" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-11" target="6a11JjnXTWsjXByUQiAF-2">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-11" target="6a11JjnXTWsjXByUQiAF-2" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="670" y="421" />
@@ -72,29 +88,29 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-11" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;ParamNameResolver&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="743" y="83" width="100" height="1021" as="geometry" />
+        <mxCell id="6a11JjnXTWsjXByUQiAF-11" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;ParamNameResolver&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="743" y="83" width="100" height="1087" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" target="6a11JjnXTWsjXByUQiAF-2">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" target="6a11JjnXTWsjXByUQiAF-2" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="541.0003448275863" y="350" as="sourcePoint" />
             <mxPoint x="541.0003448275863" y="678.9999999999998" as="targetPoint" />
             <Array as="points">
               <mxPoint x="598" y="350" />
-              <mxPoint x="598" y="863" />
+              <mxPoint x="598" y="1133" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-13" value="根据不同操作类型，路由到不同的逻辑上&lt;div&gt;进行操作&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-13" value="根据不同操作类型，路由到不同的逻辑上&lt;div&gt;进行操作&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="545" y="287" width="234" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-15" value="getNamedParams（Object[] args）：Object" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-15" value="getNamedParams（Object[] args）：Object" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="535.5" y="355" width="253" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-17" value="对入参进行处理封装后的结果" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-17" value="对入参进行处理封装后的结果" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="577" y="423" width="174" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-18" target="6a11JjnXTWsjXByUQiAF-22">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-18" target="6a11JjnXTWsjXByUQiAF-22" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1100" y="536" />
@@ -102,16 +118,24 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-18" value="&lt;div style=&quot;color: rgb(8, 8, 8);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0); text-wrap-mode: nowrap;&quot;&gt;DefaultSqlSession&lt;/span&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="955" y="83" width="100" height="1023" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-18" target="6a11JjnXTWsjXByUQiAF-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="794" y="1123" />
+              <mxPoint x="794" y="1123" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-19" value="SqlSession默认实现类：&lt;div&gt;DefaultSqlSession&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-18" value="&lt;div style=&quot;color: rgb(8, 8, 8);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0); text-wrap-mode: nowrap;&quot;&gt;DefaultSqlSession&lt;/span&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="955" y="83" width="100" height="1078" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-19" value="SqlSession默认实现类：&lt;div&gt;DefaultSqlSession&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="930" y="37" width="150" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-21" value="调用selectone,本质上调用selectList" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-21" value="调用selectone,本质上调用selectList" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="686" y="473" width="207" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-22" target="6a11JjnXTWsjXByUQiAF-27">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;" parent="1" source="6a11JjnXTWsjXByUQiAF-22" target="6a11JjnXTWsjXByUQiAF-27" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1372" y="556" />
@@ -119,16 +143,24 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-22" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;CachingExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="1139" y="83" width="100" height="1046" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-22" target="6a11JjnXTWsjXByUQiAF-18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1098" y="1114" />
+              <mxPoint x="1098" y="1114" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-24" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-22" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;CachingExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="1139" y="83" width="100" height="1078" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-24" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1065" y="502" width="48" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-26" value="如果没有开启二级缓存&lt;div&gt;不会经过缓存执行器，而是直接调用到对应&lt;/div&gt;&lt;div&gt;类型的执行器&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-26" value="如果没有开启二级缓存&lt;div&gt;不会经过缓存执行器，而是直接调用到对应&lt;/div&gt;&lt;div&gt;类型的执行器&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1069" y="23" width="246" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-27" target="6a11JjnXTWsjXByUQiAF-22">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-27" target="6a11JjnXTWsjXByUQiAF-22" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1348" y="579" />
@@ -136,16 +168,24 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-27" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;MappedStatement&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="1395" y="83" width="100" height="1053" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-27" target="6a11JjnXTWsjXByUQiAF-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1344" y="1107" />
+              <mxPoint x="1344" y="1107" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-30" value="&lt;font face=&quot;Helvetica&quot;&gt;调用MappedStatement的getBoundSql方法&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;本质上是调用SqlSource的getBoundSql方法&lt;br&gt;&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;后面还有很长的调用链路，在这里省略&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;主要做了这几件事情：&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;font&gt;1、通过&lt;/font&gt;&lt;span style=&quot;&quot;&gt;SqlNode&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;解析处理动态标签&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;（这里包括&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;${}&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;的解析处理）&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;2、通过&lt;/span&gt;sqlSourceParser&lt;span style=&quot;font-style: italic;&quot;&gt;替换&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;#{} -&amp;gt; ?并且&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;生成映射参数&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;最后生成&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;StaticSqlSource&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;3、&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;最终的&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;sql&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;相关信息封装成&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;BoundSql&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;对象&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=default;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-27" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;MappedStatement&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="1395" y="83" width="100" height="1072" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-30" value="&lt;font face=&quot;Helvetica&quot;&gt;调用MappedStatement的getBoundSql方法&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;本质上是调用SqlSource的getBoundSql方法&lt;br&gt;&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;后面还有很长的调用链路，在这里省略&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;主要做了这几件事情：&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;font&gt;1、通过&lt;/font&gt;&lt;span style=&quot;&quot;&gt;SqlNode&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;解析处理动态标签&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;（这里包括&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;${}&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;的解析处理）&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;2、通过&lt;/span&gt;sqlSourceParser&lt;span style=&quot;font-style: italic;&quot;&gt;替换&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;#{} -&amp;gt; ?并且&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;生成映射参数&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;最后生成&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;StaticSqlSource&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;3、&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;最终的&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;sql&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;相关信息封装成&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;BoundSql&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;对象&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=default;" parent="1" vertex="1">
           <mxGeometry x="1157" y="395" width="308" height="141" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-34" value="&lt;font&gt;BoundSql对象&lt;/font&gt;&lt;div&gt;&lt;div style=&quot;background-color: rgb(255, 255, 255);&quot;&gt;&lt;pre style=&quot;&quot;&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;用于表示最终可执行的 &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SQL &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;语句及其参数映射信息，是 &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SqlSource &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;解析后的结果&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1087.5" y="587" width="447" height="65" as="geometry" />
+        <mxCell id="6a11JjnXTWsjXByUQiAF-34" value="&lt;font&gt;BoundSql对象&lt;/font&gt;&lt;div&gt;&lt;div style=&quot;background-color: rgb(255, 255, 255);&quot;&gt;&lt;pre style=&quot;&quot;&gt;&lt;font face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;用于表示最终可执行的 &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SQL &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;语句及其参数映射信息，是 &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SqlSource &lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;解析后的结果&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1085" y="587" width="447" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;" edge="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1189.9966666666664" y="685" as="sourcePoint" />
             <mxPoint x="1189.9966666666664" y="730" as="targetPoint" />
@@ -155,7 +195,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-36" target="6a11JjnXTWsjXByUQiAF-47">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-36" target="6a11JjnXTWsjXByUQiAF-47" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1709" y="878" />
@@ -163,10 +203,18 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-36" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;BaseExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="1550" y="84" width="100" height="1045" as="geometry" />
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-36" target="6a11JjnXTWsjXByUQiAF-27">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="1092" />
+              <mxPoint x="1533" y="1092" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-22" target="6a11JjnXTWsjXByUQiAF-36">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-36" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;BaseExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="1550" y="84" width="100" height="1073" as="geometry" />
+        </mxCell>
+        <mxCell id="6a11JjnXTWsjXByUQiAF-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-22" target="6a11JjnXTWsjXByUQiAF-36" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1189" y="721" as="sourcePoint" />
             <mxPoint x="1655" y="721" as="targetPoint" />
@@ -176,13 +224,13 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-39" value="查询二级缓存&lt;div&gt;如果能够获取就直接返回&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1241" y="645" width="150" height="41" as="geometry" />
+        <mxCell id="6a11JjnXTWsjXByUQiAF-39" value="查询二级缓存&lt;div&gt;如果能够获取就直接返回&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1241" y="644" width="150" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-41" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-41" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1391" y="742" width="48" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;elbow=vertical;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-36" target="6a11JjnXTWsjXByUQiAF-36">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;elbow=vertical;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-36" target="6a11JjnXTWsjXByUQiAF-36" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1669" y="783" />
@@ -190,10 +238,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-46" value="查询一级缓存&lt;div&gt;如果能够获取就直接返回&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-46" value="查询一级缓存&lt;div&gt;如果能够获取就直接返回&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1614" y="732" width="150" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-54">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-54" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1935" y="981" />
@@ -201,16 +249,16 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-47" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;SimpleExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-47" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;SimpleExecutor&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
           <mxGeometry x="1758" y="83" width="100" height="1045" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-48" value="Executor有很多实现类&lt;div&gt;根据具体的实现来调用&lt;/div&gt;&lt;div&gt;这里只是示例&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-48" value="Executor有很多实现类&lt;div&gt;根据具体的实现来调用&lt;/div&gt;&lt;div&gt;这里只是示例&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1736" y="19" width="138" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-50" value="doQuery" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-50" value="doQuery" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1667" y="847" width="64" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-47">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-47" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1861" y="895" />
@@ -218,13 +266,13 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-52" value="&lt;span style=&quot;font-size: 11px; background-color: rgb(255, 255, 255);&quot;&gt;①&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-52" value="&lt;span style=&quot;font-size: 11px; background-color: rgb(255, 255, 255);&quot;&gt;①&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1839" y="865" width="29" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-53" value="①&lt;div&gt;&amp;nbsp;&lt;span style=&quot;background-color: rgb(255, 255, 255); font-size: 11px; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1.调用配置对象configuration的newStatementHandler方法&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;创建StatementHandler对象（这里实际创建的是RoutingStatementHandler&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;通过它&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;自动路由到适合的&lt;/span&gt;&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;&amp;nbsp;StatementHandler&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;实现类，创建过程中可以通过&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;插件进行增强）&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;2.调用prepareStatement初始化StatementHandler对象，通过父类BaseExecutor&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;的getConnection方法获取Connection对象；调用BaseStatementHandler的prepare&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;方法获取Statement或&lt;span style=&quot;font-style: italic;&quot;&gt;PrepareStatement&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;对象；通过ParameterHandler对象设置&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SQL上的占位符。&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-53" value="①&lt;div&gt;&amp;nbsp;&lt;span style=&quot;background-color: rgb(255, 255, 255); font-size: 11px; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1.调用配置对象configuration的newStatementHandler方法&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;创建StatementHandler对象（这里实际创建的是RoutingStatementHandler&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;通过它&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;自动路由到适合的&lt;/span&gt;&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;&amp;nbsp;StatementHandler&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-style: italic; background-color: rgb(255, 255, 255);&quot;&gt;实现类，创建过程中可以通过&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;插件进行增强）&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;2.调用prepareStatement初始化StatementHandler对象，通过父类BaseExecutor&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;的getConnection方法获取Connection对象；调用BaseStatementHandler的prepare&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;方法获取Statement或&lt;span style=&quot;font-style: italic;&quot;&gt;PrepareStatement&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;对象；通过ParameterHandler对象设置&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255); font-size: 11px;&quot; face=&quot;Helvetica&quot;&gt;&lt;span style=&quot;font-style: italic;&quot;&gt;SQL上的占位符。&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="14" y="1218" width="417" height="142" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-54" target="6a11JjnXTWsjXByUQiAF-47">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-54" target="6a11JjnXTWsjXByUQiAF-47" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1922" y="1060" />
@@ -232,16 +280,16 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-54" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;PreparedStatementHandler&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-54" value="&lt;div style=&quot;background-color: rgb(255, 255, 255); color: rgb(8, 8, 8);&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;PreparedStatementHandler&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};fontFamily=Helvetica;fontSize=12;" parent="1" vertex="1">
           <mxGeometry x="1970" y="83" width="100" height="1045" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-55" value="StatementHandler有很多实现类&lt;div&gt;根据具体的实现来调用&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-55" value="StatementHandler有很多实现类&lt;div&gt;根据具体的实现来调用&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1923" y="28" width="187" height="41" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-57" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-57" value="query" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1899" y="946" width="48" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-54" target="6a11JjnXTWsjXByUQiAF-54">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-54" target="6a11JjnXTWsjXByUQiAF-54" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="2082" y="999" />
@@ -249,13 +297,13 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-59" value="1.调用Statement实现类的execute执行查询&lt;div&gt;2.通过ResultSetHandler方法对结果集进行处理映射&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-59" value="1.调用Statement实现类的execute执行查询&lt;div&gt;2.通过ResultSetHandler方法对结果集进行处理映射&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="2025" y="952" width="290" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-61" value="结果集" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-61" value="结果集" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1890" y="1067" width="54" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" edge="1" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-36">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=0;endArrow=block;endFill=1;" parent="1" source="6a11JjnXTWsjXByUQiAF-47" target="6a11JjnXTWsjXByUQiAF-36" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="2018.19" y="1094.97" as="sourcePoint" />
             <mxPoint x="1807.19" y="1094.97" as="targetPoint" />
@@ -265,8 +313,26 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6a11JjnXTWsjXByUQiAF-65" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="6a11JjnXTWsjXByUQiAF-65" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="1683.9966964285716" y="1081.9970535714288" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-3" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1501.001530172414" y="1095.999202586207" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-4" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1298.0029094827587" y="1112.9978232758622" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-6" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1069.0005729166667" y="1117.9991145833333" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-8" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="776.9973161764707" y="1128.000992647059" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-12" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="398.00468750000005" y="1145.0009375" width="64" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Hq1wdG8I5F35Qm4fbYcO-13" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;结果集&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="173.00468749999996" y="1152.0009375000002" width="64" height="36" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

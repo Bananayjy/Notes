@@ -1,6 +1,6 @@
 ## FINAL、流程梳理
 
-### 一、总调用链路概述
+### 一、调用链路概述
 
 整个mybatis查询数据的调用链如下两张图所示，仅供参考：
 
@@ -12,20 +12,7 @@
 
 ### 二、调用链路详解
 
-（从BindingTest#shouldExecuteBoundSelectOneBlogStatement入手）
-
-> 总链路概述：
->
-> - 创建	configuration  对象，封装环境，加载配置文件、mapper接口……
-> - 开启会话（初始化执行器）
-> - 执行SQL
->   - 创建StatementHadler
->   - 通过ParamHandler完成参数的封装
->   - 通过Statement完成相关SQL操作
->   - 通过ResultHanlder完成结果集的封装 jdbc Type  -> java Type
-> - 返回结果
-
-
+以下内容从BindingTest#shouldExecuteBoundSelectOneBlogStatement测试方法入手，对整个流程链路进行跟踪
 
 #### 1.SqlSessionFactory创建、初始化
 
@@ -348,11 +335,11 @@ public Object execute(SqlSession sqlSession, Object[] args) {
 
 根据测试方法：BindingTest#shouldSelectBlogWithAParamNamedValue 其对应的时序图和调用链路如下所示（仅供参考，有些调用链比较长就省略了，最后自己代码去跟着流程调试一下）：
 
-![Mapper接口的执行.drawio](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/Mapper%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%89%A7%E8%A1%8C.drawio.png)
+![Mapper接口的执行](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/Mapper%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%89%A7%E8%A1%8C.png)
 
 
 
-### 二、需要解答的问题
+### 三、相关问题详解
 
 #### 1、关于SqlSource的创建
 
@@ -466,21 +453,28 @@ private SqlSource buildSqlSourceFromStrings(String[] strings, Class<?> parameter
 
 #### 2、一级二级缓存实现
 
+> 关于mybatis的一级二级缓存概述：
+>
+> [MyBatis](https://so.csdn.net/so/search?q=MyBatis&spm=1001.2101.3001.7020) 提供了两种缓存机制，分别是 **一级缓存** 和 **二级缓存**。它们可以显著提高数据库操作的性能，通过减少数据库的访问次数，但它们的工作原理、作用范围以及使用方式有所不同
+>
+> 一级缓存是 SqlSession 级别的缓存，也叫做 本地缓存。它默认开启，并且是 MyBatis 的默认缓存机制。在一次数据库会话（SqlSession）中，MyBatis 会将查询到的结果缓存到一级缓存中。如果相同的 SQL 被多次执行（在同一个 SqlSession 中），MyBatis 会从缓存中读取数据，而不去数据库中查询，这样可以减少数据库的访问。
+> 二级缓存是 **SqlSessionFactory** 级别的缓存，也叫做 **全局缓存**。它在 MyBatis 的多个 `SqlSession` 之间共享缓存数据。换句话说，二级缓存的数据是跨 `SqlSession` 存在的，可以共享缓存内容。
+
 二级缓存在CachingExecutor中实现，一级缓存在Executor基础实现类BaseExecutor中实现。
 
-首先二级缓存是可以手动开启和关闭的，如果二级缓存开启后（默认是开启的），那么在配置对象Confuguration创建执行器的时候，会通过CachingExecutor对执行器进行包装，如下图所示：
+首先二级缓存是可以手动开启和关闭的，如果二级缓存开启后（默认是开启的），那么在配置对象Confuguration创建执行器的时候，会通过CachingExecutor对当前使用的执行器进行包装，如下图所示：
 
 ![image-20250416162018183](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250416162018183.png)
 
 - 二级缓存
 
-开启二级缓存后，在调用Executor对象的方法后，会先调用其包装CachingExecutor的方法，然后再调用被包装（委托）的执行器的方法
+开启二级缓存后，在调用Executor对象的方法后，会先调用其包装的CachingExecutor的方法，然后再调用被包装（委托）的原始执行器的方法
 
 ![image-20250416162349035](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250416162349035.png)
 
-可以看到他都是通过TransactionalCacheManager对象去进行实现二级缓存的操作的
+可以看到他是通过TransactionalCacheManager对象去进行实现二级缓存的操作的
 
-> 专门用于在事务性环境中协调多个 TransactionalCache 实例的缓存操作，确保缓存数据与数据库事务的一致性,因为二级缓存是支持跨 Session 进行共享，此处需要考虑事务，那么，必然需要做到事务提交时，才将当前事务中查询时产生的缓存，同步到二级缓存中，若事务回滚，这些操作将被丢弃，避免脏缓存。
+> TransactionalCacheManager：专门用于在事务性环境中协调多个 TransactionalCache 实例的缓存操作，确保缓存数据与数据库事务的一致性,因为二级缓存是支持跨 Session 进行共享，此处需要考虑事务，那么，必然需要做到事务提交时，才将当前事务中查询时产生的缓存，同步到二级缓存中，若事务回滚，这些操作将被丢弃，避免脏缓存。
 
 ```java
 private final TransactionalCacheManager tcm = new TransactionalCacheManager();
@@ -496,7 +490,17 @@ TransactionalCache是支持事务的 Cache 实现类，其通过delegate成员�
 
 ![image-20250416172050637](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250416172050637.png)
 
-在事务提交、回滚后，再将结果一起刷新到二级缓存中。即在会话结束，即DefualtSqlSession调用close时，关闭会话，会调用执行器的close方法
+注意：TransactionalCache它并不存储实际缓存数据，而是管理事务期间对共享 `Cache` 的临时操作（提交或回滚），真正的缓存数据 存储在 `Mapper` 级别 的 `Cache` 对象中（如 `PerpetualCache`、`RedisCache` 等），这些 `Cache` 对象是 `SqlSessionFactory` 初始化时创建的，生命周期与 `SqlSessionFactory` 绑定：
+
+我们可以看到在对mybatis的xml配置文件进行解析的时候，通过XMLMapperBuilder的cacheElement方法去维护Cache对象：
+
+![image-20250416211459859](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250416211459859.png)
+
+对于注释，是在MapperAnnotationBuilder的parseCache方法完成对Cache的初始化
+
+![image-20250416211549253](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250416211549253.png)
+
+在事务提交、回滚后，再将结果一起刷新到二级缓存Cache的实现对象中。即在本次会话结束，即DefualtSqlSession调用close时，关闭会话，会调用执行器的close方法
 
 ```java
 // 关闭会话
@@ -515,7 +519,7 @@ public void close() {
 }
 ```
 
-然后其首先会调用包装类CachingExecutor的close方法，对tcm中数据内容进行提交或回滚（即更新到其保证的Cache实现类中）
+然后其首先会调用包装类CachingExecutor的close方法，对tcm中数据内容进行提交或回滚（即更新到其包装的Cache实现类中）
 
 ```java
 @Override
@@ -556,36 +560,323 @@ public class PerpetualCache implements Cache {
 }
 ```
 
-每次开启会话（即创建SqlSession）的时候，都会重新创建BaseExecutor对象，因此一级缓存是会话级别的。
+每次开启会话（即创建SqlSession）的时候，都会重新创建BaseExecutor对象，因此一级缓存是会话级别的，即sqlSession级别的。
+
+#### 3、关于sqlNode
+
+SQL Node 接口是 MyBatis 中用于处理 动态 SQL 标签 的核心接口，它代表了 XML 映射文件中动态 SQL 的各个组成部分，定义了所有动态 SQL 节点（如 <if>、<foreach>、<where> 等）的解析和执行行为，每个 XML 中的动态标签在解析后都会转换为对应的 SqlNode 实现类，通过调用apply方法对动态标签进行处理。
+
+其实现类：
+
+1. **StaticTextSqlNode** - 处理静态文本 SQL
+2. **IfSqlNode** - 处理 `<if>` 标签
+3. **TrimSqlNode** - 处理 `<trim>` 标签
+4. **WhereSqlNode** - 处理 `<where>` 标签（是 TrimSqlNode 的特殊形式）
+5. **SetSqlNode** - 处理 `<set>` 标签（是 TrimSqlNode 的特殊形式）
+6. **ForEachSqlNode** - 处理 `<foreach>` 标签
+7. **VarDeclSqlNode** - 处理 `<bind>` 标签
+8. **ChooseSqlNode** - 处理 `<choose>`、`<when>`、`<otherwise>` 标签组合
+9. **MixedSqlNode** - 混合多个 SqlNode
+
+10.**TextSqlNode**-处理 包含动态表达式（如 ${}）的文本 SQL 片段 的核心类
 
 
 
-#### 3、延迟加载  △
+#### 4、关于ParamNameResolver对入参的包装
+
+```java
+// 执行对应的操作
+public Object execute(SqlSession sqlSession, Object[] args) {
+    Object result;
+    switch (command.getType()) {
+        case INSERT: {
+            // 转换参数
+            Object param = method.convertArgsToSqlCommandParam(args);
+            // 执行 INSERT 操作
+            // 转换 rowCount
+            result = rowCountResult(sqlSession.insert(command.getName(), param));
+            break;
+        }
+        case UPDATE: {
+            // 转换参数
+            Object param = method.convertArgsToSqlCommandParam(args);
+            // 执行更新
+            // 转换 rowCount
+            result = rowCountResult(sqlSession.update(command.getName(), param));
+            break;
+        }
+        case DELETE: {
+            // 转换参数
+            Object param = method.convertArgsToSqlCommandParam(args);
+            // 转换 rowCount
+            result = rowCountResult(sqlSession.delete(command.getName(), param));
+            break;
+        }
+        case SELECT:
+            // 无返回，并且有 ResultHandler 方法参数，则将查询的结果，提交给 ResultHandler 进行处理
+            if (method.returnsVoid() && method.hasResultHandler()) {
+                executeWithResultHandler(sqlSession, args);
+                result = null;
+            } else if (method.returnsMany()) { // 执行查询，返回列表
+                result = executeForMany(sqlSession, args);
+            } else if (method.returnsMap()) { // 执行查询，返回 Map
+                result = executeForMap(sqlSession, args);
+            } else if (method.returnsCursor()) { // 执行查询，返回 Cursor
+                result = executeForCursor(sqlSession, args);
+            } else { // 执行查询，返回单个对象
+                // 转换参数（入参映射关系）
+                Object param = method.convertArgsToSqlCommandParam(args);
+                // 查询单条
+                result = sqlSession.selectOne(command.getName(), param);
+                if (method.returnsOptional() && (result == null || !method.getReturnType().equals(result.getClass()))) {
+                    result = Optional.ofNullable(result);
+                }
+            }
+            break;
+        case FLUSH:
+            // 刷入批处理
+            result = sqlSession.flushStatements();
+            break;
+        default:
+            throw new BindingException("Unknown execution method for: " + command.getName());
+    }
+    // 返回结果为 null ，并且返回类型为基本类型，则抛出 BindingException 异常
+    if (result == null && method.getReturnType().isPrimitive() && !method.returnsVoid()) {
+        throw new BindingException("Mapper method '" + command.getName()
+                                   + "' attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
+    }
+    return result;
+}
+```
+
+可以看到在调用MapperMethod的execute方法的时候，里面会根据操作类型进入到不同的逻辑中，但是都会去调用一个共同的操作，即转换参数：
+
+```java
+// 转换参数
+Object param = method.convertArgsToSqlCommandParam(args);
+```
+
+该convertArgsToSqlCommandParam方法下，就是调用ParamNameResolver的getNamedParams完成对入参处理：
+
+```java
+// 获得 SQL 通用参数映射
+public Object convertArgsToSqlCommandParam(Object[] args) {
+    return paramNameResolver.getNamedParams(args);
+}
+```
+
+关于ParamNameResolver成员变量：
+
+```java
+public static final String GENERIC_NAME_PREFIX = "param";
+
+// 通过静态代码块初始化后：param0、param1、param2 ……
+public static final String[] GENERIC_NAME_CACHE = new String[10];
+
+static {
+    for (int i = 0; i < 10; i++) {
+        GENERIC_NAME_CACHE[i] = GENERIC_NAME_PREFIX + (i + 1);
+    }
+}
+
+// 是否使用实际的参数名称
+private final boolean useActualParamName;
+
+// 参数名映射  key：参数顺序  value：参数名
+/**
+   * The key is the index and the value is the name of the parameter.<br />
+   * The name is obtained from {@link Param} if specified. When {@link Param} is not specified, the parameter index is
+   * used. Note that this index could be different from the actual index when the method has special parameters (i.e.
+   * {@link RowBounds} or {@link ResultHandler}).
+   * <ul>
+   * <li>aMethod(@Param("M") int a, @Param("N") int b) -&gt; {{0, "M"}, {1, "N"}}</li>
+   * <li>aMethod(int a, int b) -&gt; {{0, "0"}, {1, "1"}}</li>
+   * <li>aMethod(int a, RowBounds rb, int b) -&gt; {{0, "0"}, {2, "1"}}</li>
+   * </ul>
+   */
+private final SortedMap<Integer, String> names;
+
+// 是否有@Param注解
+private boolean hasParamAnnotation;
+```
+
+关于ParamNameResolver的构造器
+
+```java
+/**
+* 构造器功能：初始化hasParamAnnotation、useActualParamName、names成员变量
+* 1.从当前Mapper接口对应的方法的@Param注解中获取参数名称
+* 2.如果没有@Param注解，看是否开启了使用实际的参数名称，如果开启了，则根据方法参数的参数名中获取参数名称
+* 3.如果没有开启使用实际的参数名称，使用 map 的顺序，作为编号
+* 会将上面获取到的名称放入到map中，然后赋值给成员变量names对象进行存储
+*
+* @param config
+* @param method
+*/
+public ParamNameResolver(Configuration config, Method method) {
+    // 从配置文件中读取参数，是否使用实际的参数名称
+    this.useActualParamName = config.isUseActualParamName();
+    // 获取当前方法的参数类型，并作为一个数组返回
+    final Class<?>[] paramTypes = method.getParameterTypes();
+    // 获取当前所有参数的注解信息（二维，一维表示哪一个参数，二维表示有哪些注释）
+    final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+    // 声明一个TreeMap，用于参访参数顺序（key）和参数名称（value）
+    final SortedMap<Integer, String> map = new TreeMap<>();
+    // 获取当前参数属性
+    int paramCount = paramAnnotations.length;
+    // get names from @Param annotations
+    for (int paramIndex = 0; paramIndex < paramCount; paramIndex++) {
+        // 忽略，如果是特殊参数
+        if (isSpecialParameter(paramTypes[paramIndex])) {
+            // skip special parameters
+            continue;
+        }
+        String name = null;
+        for (Annotation annotation : paramAnnotations[paramIndex]) { // 首先，从 @Param 注解中获取参数
+            if (annotation instanceof Param) {
+                hasParamAnnotation = true;
+                // 获取名称
+                name = ((Param) annotation).value();
+                break;
+            }
+        }
+        if (name == null) {
+            // @Param was not specified.
+            if (useActualParamName) { // 其次，获取真实的参数名（如果在配置文件中开启了使用真实参数名称）
+                name = getActualParamName(method, paramIndex);
+            }
+            if (name == null) {  // 最差，使用 map 的顺序，作为编号
+                // use the parameter index as the name ("0", "1", ...)
+                // gcode issue #71
+                name = String.valueOf(map.size());
+            }
+        }
+        // 添加到 map 中
+        map.put(paramIndex, name);
+    }
+    // 构建不可变集合
+    names = Collections.unmodifiableSortedMap(map);
+}
+```
+
+该构造器实在场景MapperMethod的成员变量MethodSignature时候进行初始化的
+
+```java
+// 构造器
+public MethodSignature(Configuration configuration, Class<?> mapperInterface, Method method) {
+    // 初始化 returnType 属性
+    Type resolvedReturnType = TypeParameterResolver.resolveReturnType(method, mapperInterface);
+    if (resolvedReturnType instanceof Class<?>) { // 普通类
+        this.returnType = (Class<?>) resolvedReturnType;
+    } else if (resolvedReturnType instanceof ParameterizedType) { // 泛型
+        this.returnType = (Class<?>) ((ParameterizedType) resolvedReturnType).getRawType();
+    } else { // 内部类等等
+        this.returnType = method.getReturnType();
+    }
+    // 初始化 returnsVoid 属性：判断返回类似是否为void
+    this.returnsVoid = void.class.equals(this.returnType);
+    // 初始化 returnsMany 属性
+    this.returnsMany = configuration.getObjectFactory().isCollection(this.returnType) || this.returnType.isArray();
+    // 初始化 returnsCursor 属性
+    this.returnsCursor = Cursor.class.equals(this.returnType);
+    // 初始化 returnsOptional 属性
+    this.returnsOptional = Optional.class.equals(this.returnType);
+    // 获得注解的 @MapKey的value()值，并初始化mapKey
+    this.mapKey = getMapKey(method);
+    // 初始化 returnsMap 属性
+    this.returnsMap = this.mapKey != null;
+    // 初始化rowBoundsIndex：获取RowBounds在方法参数中的位置（如果为 null ，说明不存在这个类型）
+    this.rowBoundsIndex = getUniqueParamIndex(method, RowBounds.class);
+    // 初始化ResultHandler：获得ResultHandler}在方法参数中的位置（如果为 null ，说明不存在这个类型）
+    this.resultHandlerIndex = getUniqueParamIndex(method, ResultHandler.class);
+    // 初始化 ParamNameResolver 对象
+    this.paramNameResolver = new ParamNameResolver(configuration, method);
+}
+```
+
+关于getNamedParams方法如下所示：
+
+```java
+/**
+   * A single non-special parameter is returned without a name. Multiple parameters are named using the naming rule. In
+   * addition to the default names, this method also adds the generic names (param1, param2, ...).
+   * 返回一个没有名称的非特殊参数。多个参数使用命名规则命名。除了默认名称之外，该方法还添加了泛型名称（param1, param2，…）
+   *
+   * @param args
+   *          the args
+   *
+   * @return the named params
+   */
+public Object getNamedParams(Object[] args) {
+    // 获取参数数量
+    final int paramCount = names.size();
+    if (args == null || paramCount == 0) { // 无参数，则返回 null
+        return null;
+    }
+    if (!hasParamAnnotation && paramCount == 1) { // 只有一个非注解的参数，直接返回首元素
+        Object value = args[names.firstKey()];
+        return wrapToMapIfCollection(value, useActualParamName ? names.get(names.firstKey()) : null);
+    } else {
+        // 集合。
+        // 组合 1 ：KEY：参数名（names中存储的参数名），VALUE：参数值
+        // 组合 2 ：KEY：GENERIC_NAME_PREFIX + 参数顺序，VALUE ：参数值
+        final Map<String, Object> param = new ParamMap<>();
+        int i = 0;
+        for (Map.Entry<Integer, String> entry : names.entrySet()) { // 遍历 names 集合
+            // 组合 1 ：添加到 param 中
+            param.put(entry.getValue(), args[entry.getKey()]);
+            // add generic param names (param1, param2, ...)
+            // 组合 2 ：添加到 param 中
+            final String genericParamName = i < 10 ? GENERIC_NAME_CACHE[i] : GENERIC_NAME_PREFIX + (i + 1);
+            // ensure not to overwrite parameter named with @Param
+            if (!names.containsValue(genericParamName)) {
+                param.put(genericParamName, args[entry.getKey()]);
+            }
+            i++;
+        }
+        return param;
+    }
+}
+```
+
+> 具体示例：
+>
+> 示例1：
+>
+> ```java
+> // @formatter:off
+> @Select("SELECT * FROM blog "
+>        + "WHERE id = #{param1} AND title = #{param2}")
+> // @formatter:on
+> Blog selectBlogByDefault31ParamNames(int id, String title);
+> ```
+>
+> 调用getNamedParams结果：
+>
+> ![image-20250417095741933](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250417095741933.png)
+>
+> 示例2：
+>
+> ```java
+> // @formatter:off
+> @Select("SELECT * FROM blog "
+>        + "WHERE ${column} = #{id} AND title = #{value}")
+> // @formatter:on
+> Blog selectBlogWithAParamNamedValue(@Param("column") String column, @Param("id") int id,
+>     @Param("value") String title);
+> ```
+>
+> 调用getNamedParams结果：
+>
+> ![image-20250417095804370](FINAL%E3%80%81%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86.assets/image-20250417095804370.png)
 
 
 
+#### 5、延迟加载  △
+
+没用过，先放着
 
 
-#### 4、关于sqlNode
-
-
-
-
-
-
-
-============================================================================================================================
-
-
-
-- SpringBoot项目中如何扫描Mapper接口，并将其代理对象注册到IOC容器中
-- ParamHandler完成参数的封装这一部分要在看一下
-- 延迟加载是什么？
-- ParamResolver 对入参是如何进行封装的？
-- 关于动态标签if是在哪里进行拼接的？
-- 关于sqlNode
-
-- 关于TransactionalCacheManager
 
 
 
