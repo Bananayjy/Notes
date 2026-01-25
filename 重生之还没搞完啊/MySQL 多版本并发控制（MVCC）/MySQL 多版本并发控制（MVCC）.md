@@ -90,7 +90,7 @@ ReadView 就是事务A在使用MVCC机制进行快照读操作时产生的读视
 
 的最新版本就好了。
 
-SERIALIZABLE串行化 隔离级别的事务，InnoDB规定使用加锁的方式来访问记录。
+SERIALIZABLE串行化 隔离级别的事务，InnoDB规定使用加锁的方式来访问记录。（普通的select，也会加上for update，即加个读锁）
 
 使用 READ COMMITTED 和 REPEATABLE READ 隔离级别的事务，都必须保证读到 已经提交了的 事务修改过的记录。假如另一个事务已经修改了记录但是尚未提交，是不能直接读取最新版本的记录的，核心问题就是需要判断一下版本链中的哪个版本是当前事务可见的，这是ReadView要解决的主要问题。
 
